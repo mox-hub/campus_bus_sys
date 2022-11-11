@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     //  配置logger
-    private final static Logger logger = LoggerFactory.getLogger(CampusService.class);
+    private final static Logger logger = LoggerFactory.getLogger(UserService.class);
     private final static String projectName = "campus-bus-server";
     private final static String text = "用户";
     
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
                 userMapper.selectPage(page,null);
                 List<User> Useres = page.getRecords();
                 int pageTotal = (int) page.getTotal();
-                logger.info("[{}]:: 查询所有{}信息 >>> 查询成功", projectName, text);
+                logger.info("[{}]getUserInfo:: 查询所有{}信息 >>> 查询成功", projectName, text);
                 return new Response<>(Useres,pageTotal);
             }
             else if (mode.equals("id")) {
