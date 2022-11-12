@@ -14,8 +14,8 @@ class FindplatformServerTestApplicationTests {
 
 
     @Test
-    void contextLoads() throws Exception{
-        System.out.println("获取的数据库连接为:"+dataSource.getConnection());
+    void contextLoads() throws Exception {
+        System.out.println("获取的数据库连接为:" + dataSource.getConnection());
     }
 
 

@@ -20,7 +20,7 @@ public class BusController {
     }
 
     @GetMapping(value = "/bus/queryBus")
-    public Object queryBus(@RequestParam Map<String,String> data) {
+    public Object queryBus(@RequestParam Map<String, String> data) {
         Object res = busService.queryBus(data);
         return res;
     }
@@ -31,15 +31,15 @@ public class BusController {
         return res;
     }
 
-    @PostMapping(value = "/bus/deleteBus")
-    public Object deleteBus(@RequestParam("busId") String id) {
-        Object res = busService.deleteBus(id);
-        return res;
-    }
-
     @PostMapping(value = "/bus/updateBus")
     public Object updateBus(@RequestBody Bus bus) {
         Object res = busService.updateBus(bus);
+        return res;
+    }
+
+    @PostMapping(value = "/bus/deleteBus")
+    public Object deleteBus(@RequestParam("busId") String id) {
+        Object res = busService.deleteBus(id);
         return res;
     }
 }

@@ -26,7 +26,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping(value = "/user/getUserInfo")
-    public Object getUserInfo(@RequestParam Map<String, String> data){
+    public Object getUserInfo(@RequestParam Map<String, String> data) {
         Object res = userService.getUserInfo(data);
         return res;
     }

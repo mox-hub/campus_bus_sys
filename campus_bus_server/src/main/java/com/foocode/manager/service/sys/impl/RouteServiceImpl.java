@@ -1,6 +1,7 @@
 package com.foocode.manager.service.sys.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.foocode.manager.mapper.sys.RouteMapper;
@@ -31,12 +32,12 @@ public class RouteServiceImpl implements RouteService {
     @Override
     public Object getRouteList() {
         try {
-            List<Route> routees = routeMapper.selectList(null);
-            logger.info("[{}]:: 查询所有{}信息 >>> 查询成功 {}", projectName, text, routees);
-            return new Response<>(routees);
-        }catch (NullPointerException e) {
-            Response<Object> response = new Response(-1, "未查询到{}！",text);
-            logger.error("[{}]::查询所有{}信息 >>> 查询失败！{}",projectName, text,response);
+            List<Route> routes = routeMapper.selectList(null);
+            logger.info("[{}]:: 查询所有{}信息 >>> 查询成功 {}", projectName, text, routes);
+            return new Response<>(routes);
+        } catch (NullPointerException e) {
+            Response<Object> response = new Response(-1, "未查询到{}！", text);
+            logger.error("[{}]::查询所有{}信息 >>> 查询失败！{}", projectName, text, response);
             return response;
         }
     }
@@ -45,39 +46,36 @@ public class RouteServiceImpl implements RouteService {
     public Object queryRoute(Map<String, String> data) {
         String mode = data.get("mode");
         String options = data.get("options");
-        logger.info("[{}]:: 查询{}信息:: 查询模式->"+ mode + " 查询参数->" + options, projectName, text);
-        IPage page = new Page(Integer.parseInt(data.get("pageIndex")),Integer.parseInt(data.get("pageSize")));
+        logger.info("[{}]:: 查询{}信息:: 查询模式->" + mode + " 查询参数->" + options, projectName, text);
+        IPage page = new Page(Integer.parseInt(data.get("pageIndex")), Integer.parseInt(data.get("pageSize")));
         try {
             if (options.equals("all")) {
                 QueryWrapper<Route> wrapper = new QueryWrapper<>();
-                routeMapper.selectPage(page,null);
-                List<Route> routees = page.getRecords();
+                routeMapper.selectPage(page, null);
+                List<Route> routes = page.getRecords();
                 int pageTotal = (int) page.getTotal();
                 logger.info("[{}]:: 查询所有{}信息 >>> 查询成功", projectName, text);
-                return new Response<>(routees,pageTotal);
-            }
-            else if (mode.equals("id")) {
+                return new Response<>(routes, pageTotal);
+            } else if (mode.equals("id")) {
                 Route route = routeMapper.selectById(options);
-                List<Route> routees = new ArrayList<>();
-                routees.add(route);
-                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功 {}", projectName, text, mode, routees);
-                return new Response<>(routees);
-            }
-            else if (mode.equals("name")) {
+                List<Route> routes = new ArrayList<>();
+                routes.add(route);
+                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功 {}", projectName, text, mode, routes);
+                return new Response<>(routes);
+            } else if (mode.equals("name")) {
                 QueryWrapper<Route> wrapper = new QueryWrapper<>();
-                wrapper.eq("company_name",options);
-                routeMapper.selectPage(page,wrapper);
-                List<Route> routees = page.getRecords();
+                wrapper.eq("company_name", options);
+                routeMapper.selectPage(page, wrapper);
+                List<Route> routes = page.getRecords();
                 int pageTotal = (int) page.getTotal();
                 logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功", projectName, mode, text);
-                return new Response<>(routees,pageTotal);
-            }
-            else {
+                return new Response<>(routes, pageTotal);
+            } else {
                 Response<Object> response = new Response<>(-2, "查询模式错误！");
-                logger.error("[{}]:: 查询所有{}信息 >>> 查询失败 [{}]" , projectName, text, response);
+                logger.error("[{}]:: 查询所有{}信息 >>> 查询失败 [{}]", projectName, text, response);
                 return response;
             }
-        }catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             Response<Object> response = new Response<>(-1, "未查询到校区！");
             logger.error("[{}]::查询{}信息 >>> 查询失败！[{}]", projectName, text, response);
             return response;
@@ -89,11 +87,11 @@ public class RouteServiceImpl implements RouteService {
         try {
             int res = routeMapper.insert(route);
             Response<Object> response = new Response<>(res, "已添加一条数据！");
-            logger.info("[{}] RouteService::添加{}数据 >>> 添加成功！[{}]",projectName, text, response);
+            logger.info("[{}] RouteService::添加{}数据 >>> 添加成功！[{}]", projectName, text, response);
             return response;
         } catch (NullPointerException e) {
             Response<Object> response = new Response<>(-1, "创建失败！");
-            logger.error("[{}] RouteService::添加{}数据 >>> 添加失败！[{}]",projectName, text, e);
+            logger.error("[{}] RouteService::添加{}数据 >>> 添加失败！[{}]", projectName, text, e);
             return response;
         }
     }
@@ -101,15 +99,15 @@ public class RouteServiceImpl implements RouteService {
     @Override
     public Object updateRoute(Route route) {
         try {
-            QueryWrapper<Route> wrapper = new QueryWrapper<>();
-            wrapper = wrapper.eq("route_id",route.getRouteId());
-            int res = routeMapper.update(route, wrapper);
+            UpdateWrapper<Route> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.eq("bus_id", route.getRouteId());
+            int res = routeMapper.update(route, updateWrapper);
             Response<Object> response = new Response<>(res, "已更新一条数据");
-            logger.info("[{}]::更新{}数据 >>> 更新成功！[{}]",projectName, text, response);
+            logger.info("[{}]::更新{}数据 >>> 更新成功！[{}]", projectName, text, response);
             return response;
         } catch (NullPointerException e) {
             Response<Object> response = new Response<>(-1, "更新失败！");
-            logger.error("[{}]::更新{}数据 >>> 更新失败！[{}]",projectName, text, e);
+            logger.error("[{}]::更新{}数据 >>> 更新失败！[{}]", projectName, text, e);
             return response;
         }
     }
@@ -120,11 +118,11 @@ public class RouteServiceImpl implements RouteService {
             System.out.println(id);
             int res = routeMapper.deleteById(id);
             Response<Object> response = new Response(res, "已删除一条数据！");
-            logger.info("[{}]::删除{}数据 >>> 删除成功！[{}]",projectName, text, response);
+            logger.info("[{}]::删除{}数据 >>> 删除成功！[{}]", projectName, text, response);
             return response;
         } catch (NullPointerException e) {
             Response<Object> response = new Response<>(-1, "删除失败！");
-            logger.error("[{}]::删除{}数据 >>> 删除失败！[{}]",projectName, text, e);
+            logger.error("[{}]::删除{}数据 >>> 删除失败！[{}]", projectName, text, e);
             return response;
         }
     }

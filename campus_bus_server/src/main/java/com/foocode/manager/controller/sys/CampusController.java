@@ -27,7 +27,7 @@ public class CampusController {
     }
 
     @GetMapping(value = "/campus/queryCampus")
-    public Object queryCampus(@RequestParam Map<String,String> data) {
+    public Object queryCampus(@RequestParam Map<String, String> data) {
         Object res = campusService.queryCampus(data);
         return res;
     }

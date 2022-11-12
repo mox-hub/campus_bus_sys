@@ -19,7 +19,8 @@ public class Response<T> {
      *
      * @param i
      * @param s
-     * @param text*/
+     * @param text
+     */
     public Response(int i, String s, String text) {
 
         this.code = 0;
@@ -28,6 +29,7 @@ public class Response<T> {
 
     /**
      * 若没有数据返回，可以人为指定状态码和提示信息
+     *
      * @param code
      * @param msg
      **/
@@ -39,6 +41,7 @@ public class Response<T> {
 
     /**
      * 有数据返回时，状态码为0，默认提示信息为：操作成功！
+     *
      * @param data
      **/
     public Response(T data) {
@@ -48,7 +51,7 @@ public class Response<T> {
         this.data = data;
     }
 
-    public Response(T data,Integer pageTotal) {
+    public Response(T data, Integer pageTotal) {
 
         this.code = 0;
         this.msg = "操作成功！";
@@ -58,6 +61,7 @@ public class Response<T> {
 
     /**
      * 有数据返回，状态码为0，人为指定提示信息
+     *
      * @param data
      * @param msg
      **/

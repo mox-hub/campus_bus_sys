@@ -11,7 +11,7 @@ public interface BusService {
 
     Object createBus(Bus bus);
 
-    Object deleteBus(String id);
-
     Object updateBus(Bus bus);
+
+    Object deleteBus(String id);
 }

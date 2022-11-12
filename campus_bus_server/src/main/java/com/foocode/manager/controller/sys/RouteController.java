@@ -20,7 +20,7 @@ public class RouteController {
     }
 
     @GetMapping(value = "/route/queryRoute")
-    public Object queryRoute(@RequestParam Map<String,String> data) {
+    public Object queryRoute(@RequestParam Map<String, String> data) {
         Object res = routeService.queryRoute(data);
         return res;
     }
@@ -31,15 +31,15 @@ public class RouteController {
         return res;
     }
 
-    @PostMapping(value = "/route/deleteRoute")
-    public Object deleteRoute(@RequestParam("routeId") String id) {
-        Object res = routeService.deleteRoute(id);
-        return res;
-    }
-
     @PostMapping(value = "/route/updateRoute")
     public Object updateRoute(@RequestBody Route route) {
         Object res = routeService.updateRoute(route);
+        return res;
+    }
+
+    @PostMapping(value = "/route/deleteRoute")
+    public Object deleteRoute(@RequestParam("routeId") String id) {
+        Object res = routeService.deleteRoute(id);
         return res;
     }
 }
