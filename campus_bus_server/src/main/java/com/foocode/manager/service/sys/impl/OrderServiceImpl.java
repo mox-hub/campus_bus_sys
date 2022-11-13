@@ -45,7 +45,7 @@ public class OrderServiceImpl implements OrderService {
     public Object queryOrder(Map<String, String> data) {
         String mode = data.get("mode");
         String options = data.get("options");
-        logger.info("[{}]:: 查询{}信息:: 查询模式->" + mode + " 查询参数->" + options, projectName, text);
+        logger.info("[{}]:: 查询{}信息:: 查询模式-> " + mode + " 查询参数->" + options, projectName, text);
         IPage page = new Page(Integer.parseInt(data.get("pageIndex")), Integer.parseInt(data.get("pageSize")));
         try {
             if (options.equals("all")) {

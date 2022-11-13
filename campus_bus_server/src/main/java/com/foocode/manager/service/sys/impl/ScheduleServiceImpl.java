@@ -9,15 +9,14 @@ import com.foocode.manager.mapper.sys.ScheduleMapper;
 import com.foocode.manager.model.Response;
 import com.foocode.manager.model.sys.Schedule;
 import com.foocode.manager.service.sys.ScheduleService;
+
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service("schedule")
 public class ScheduleServiceImpl implements ScheduleService {
@@ -47,7 +46,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     public Object querySchedule(Map<String, String> data) {
         String mode = data.get("mode");
         String options = data.get("options");
-        logger.info("[{}]:: 查询{}信息:: 查询模式->" + mode + " 查询参数->" + options, projectName, text);
+        logger.info("[{}]:: 查询{}信息:: 查询模式-> " + mode + " 查询参数->" + options, projectName, text);
         IPage page = new Page(Integer.parseInt(data.get("pageIndex")), Integer.parseInt(data.get("pageSize")));
         try {
             if (options.equals("all")) {
@@ -99,35 +98,30 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public Object updateSeat(String id, String seatId) {
-        //Schedule schedule = scheduleMapper.selectById(id);
-        //List<String> seats = Arrays.asList(schedule.getSeatInfo().split(","));
-        List<String> seats = Arrays.asList("0403,0506,0708".split(","));
-        System.out.println(seats.getClass());
-//        LambdaUpdateWrapper<Schedule> lambda = new UpdateWrapper<Schedule>().lambda();
-//        lambda.set(Schedule::getSeatInfo, seatId)
-//                .eq(Schedule::getScheduleId, id);
-/*
- LambdaUpdateWrapper<Schedule> lambda = new LambdaUpdateWrapper<>();
-        lambda.set(实体类::getName, "张三")
-                .eq(实体类::getId, id);
-        this.update(lambda);//提交
-         LambdaUpdateWrapper<实体类> lambda = new UpdateWrapper<>().lambda();
-        lambda.set(Schedule::getSeatInfo(), id)
-                .eq(Schedule::getScheduleId(), id);
-        this.update(lambda);//提交
- */
+        try {
+            Schedule schedule = scheduleMapper.selectById(id);
+            String seatInfo = schedule.getSeatInfo();
+            Set<String> seats = new HashSet<>(Arrays.asList(seatInfo.split(",")));
+            if (seats.add(seatId)) {
+                String newSeats = StringUtils.join(seats.toArray(), ",");
+                LambdaUpdateWrapper<Schedule> updateWrapper = new UpdateWrapper<Schedule>().lambda();
+                updateWrapper.set(Schedule::getSeatInfo, newSeats)
+                        .eq(Schedule::getScheduleId, id);
+                int res = scheduleMapper.update(null, updateWrapper);
+                Response<Object> response = new Response<>(res, "已更新一条数据");
+                logger.info("[{}]::更新选座数据 >>> 更新成功！[{}]", projectName, seatInfo);
+                return response;
+            } else {
+                Response<Object> response = new Response<>(-1, "更新失败！");
+                logger.info("[{}]::更新选座数据 >>> {}座已被占用 >>> 更新失败！[{}]", projectName, seatId, response);
+                return response;
+            }
+        } catch (NullPointerException e) {
+            Response<Object> response = new Response<>(-1, "更新失败！");
+            logger.error("[{}]::更新选座数据 >>> 更新失败！[{}]", projectName, e);
+            return response;
+        }
 
-//        UpdateWrapper<Schedule> updateWrapper = new UpdateWrapper<>();
-//        updateWrapper.eq("schedule_id", id);
-//        int res = scheduleMapper.update(null, updateWrapper);
-        /*
-
-                List<Schedule> schedules = new ArrayList<>();
-                schedules.add(schedule);
-                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功 {}", projectName, text, mode, schedules);
-                return new Response<>(schedules);
-         */
-        return null;
     }
 
     @Override
@@ -161,4 +155,3 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
     }
 }
-

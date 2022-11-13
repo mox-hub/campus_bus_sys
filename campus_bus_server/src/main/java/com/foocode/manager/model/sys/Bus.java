@@ -50,4 +50,14 @@ public class Bus {
     public void setBusType(String busType) {
         this.busType = busType;
     }
+
+    @Override
+    public String toString() {
+        return "Bus{" +
+                "busId='" + busId + '\'' +
+                ", busName='" + busName + '\'' +
+                ", busImage='" + busImage + '\'' +
+                ", busType='" + busType + '\'' +
+                '}';
+    }
 }

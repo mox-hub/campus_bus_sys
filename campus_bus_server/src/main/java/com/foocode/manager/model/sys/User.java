@@ -70,4 +70,16 @@ public class User {
     public void setCampusId(String campusId) {
         this.campusId = campusId;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId='" + userId + '\'' +
+                ", userName='" + userName + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", phone='" + phone + '\'' +
+                ", workId='" + workId + '\'' +
+                ", campusId='" + campusId + '\'' +
+                '}';
+    }
 }

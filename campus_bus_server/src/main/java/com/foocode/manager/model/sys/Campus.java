@@ -32,4 +32,12 @@ public class Campus {
     public void setCampusName(String campusName) {
         this.campusName = campusName;
     }
+
+    @Override
+    public String toString() {
+        return "Campus{" +
+                "campusId='" + campusId + '\'' +
+                ", campusName='" + campusName + '\'' +
+                '}';
+    }
 }

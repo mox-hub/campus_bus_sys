@@ -51,4 +51,14 @@ public class Route {
     public void setStopStation(String stopStation) {
         this.stopStation = stopStation;
     }
+
+    @Override
+    public String toString() {
+        return "Route{" +
+                "routeId='" + routeId + '\'' +
+                ", startStation='" + startStation + '\'' +
+                ", endStation='" + endStation + '\'' +
+                ", stopStation='" + stopStation + '\'' +
+                '}';
+    }
 }

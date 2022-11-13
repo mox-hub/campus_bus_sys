@@ -32,12 +32,6 @@ public class ScheduleController {
         return res;
     }
 
-    @PostMapping(value = "/schedule/updateSeat")
-    public Object updateSeat(@RequestParam("scheduleId") String id, @RequestParam("seatId") String seatId) {
-        Object res = scheduleService.updateSeat(id, seatId);
-        return res;
-    }
-
     @PostMapping(value = "/schedule/updateSchedule")
     public Object updateSchedule(@RequestBody Schedule schedule) {
         Object res = scheduleService.updateSchedule(schedule);

@@ -86,4 +86,18 @@ public class Schedule {
     public void setSeatInfo(String seatInfo) {
         this.seatInfo = seatInfo;
     }
+
+    @Override
+    public String toString() {
+        return "Schedule{" +
+                "scheduleId='" + scheduleId + '\'' +
+                ", startLocation='" + startLocation + '\'' +
+                ", endLocation='" + endLocation + '\'' +
+                ", routeId='" + routeId + '\'' +
+                ", startTime='" + startTime + '\'' +
+                ", date='" + date + '\'' +
+                ", busId='" + busId + '\'' +
+                ", seatInfo='" + seatInfo + '\'' +
+                '}';
+    }
 }
