@@ -101,9 +101,9 @@ public class ScheduleServiceImpl implements ScheduleService {
         try {
             Schedule schedule = scheduleMapper.selectById(id);
             String seatInfo = schedule.getSeatInfo();
-            Set<String> seats = new HashSet<>(Arrays.asList(seatInfo.split(",")));
+            Set<String> seats = new TreeSet<>(Arrays.asList(seatInfo.substring(1, seatInfo.length() - 1).split(",")));
             if (seats.add(seatId)) {
-                String newSeats = StringUtils.join(seats.toArray(), ",");
+                String newSeats = "[" + StringUtils.join(seats.toArray(), ",") + "]";
                 LambdaUpdateWrapper<Schedule> updateWrapper = new UpdateWrapper<Schedule>().lambda();
                 updateWrapper.set(Schedule::getSeatInfo, newSeats)
                         .eq(Schedule::getScheduleId, id);
@@ -112,7 +112,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 logger.info("[{}]::更新选座数据 >>> 更新成功！[{}]", projectName, seatInfo);
                 return response;
             } else {
-                Response<Object> response = new Response<>(-1, "更新失败！");
+                Response<Object> response = new Response<>(-1, seatId + "座已被占用更新失败！");
                 logger.info("[{}]::更新选座数据 >>> {}座已被占用 >>> 更新失败！[{}]", projectName, seatId, response);
                 return response;
             }
