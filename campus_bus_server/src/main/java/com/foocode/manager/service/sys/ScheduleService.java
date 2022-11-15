@@ -12,7 +12,7 @@ public interface ScheduleService {
 
     Object createSchedule(Schedule schedule);
 
-    Object updateSeat(String id, String seatId);
+    Object updateSeat(String state, String id, String seatId);
 
     Object updateSchedule(Schedule schedule);
 
