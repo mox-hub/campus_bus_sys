@@ -24,7 +24,12 @@
             <el-table :data="busData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
                 <el-table-column prop="busId" label="校车ID"  align="center"></el-table-column>
                 <el-table-column prop="busName" label="校车名称" align="center"></el-table-column>
-                <el-table-column prop="busImage" label="校车图片" align="center"></el-table-column>
+                <el-table-column label="校车图片" align="center">
+                    <template #default="routeData">
+                        <el-image class="table-td-thumb" :src="routeData.row.busImage" :preview-src-list="[routeData.row.busImage]">
+                        </el-image>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="busType" label="校车类型" align="center"></el-table-column>
                 <!-- 操作栏 -->
                 <el-table-column label="操作" width="180" align="center">

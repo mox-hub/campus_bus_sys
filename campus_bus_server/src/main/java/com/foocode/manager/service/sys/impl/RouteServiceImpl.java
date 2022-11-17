@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,9 +54,11 @@ public class RouteServiceImpl implements RouteService {
                 logger.info("[{}]:: 查询所有{}信息 >>> 查询成功", projectName, text);
                 return new Response<>(routes, pageTotal);
             } else if ("id".equals(mode)) {
+                List<Route> routes = new ArrayList<>();
                 Route route = routeMapper.selectById(options);
+                routes.add(route);
                 logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功 {}", projectName, text, mode, route);
-                return new Response<>(route);
+                return new Response<>(routes);
             } else {
                 Response<Object> response = new Response<>(-2, "查询模式错误！");
                 logger.error("[{}]:: 查询所有{}信息 >>> 查询失败 [{}]", projectName, text, response);
@@ -86,7 +89,7 @@ public class RouteServiceImpl implements RouteService {
     public Object updateRoute(Route route) {
         try {
             UpdateWrapper<Route> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.eq("bus_id", route.getRouteId());
+            updateWrapper.eq("route_id", route.getRouteId());
             int res = routeMapper.update(route, updateWrapper);
             Response<Object> response = new Response<>(res, "已更新一条数据");
             logger.info("[{}]::更新{}数据 >>> 更新成功！[{}]", projectName, text, response);
