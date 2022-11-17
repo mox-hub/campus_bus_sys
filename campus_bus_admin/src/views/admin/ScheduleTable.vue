@@ -4,28 +4,32 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 路线信息管理
+                    <i class="el-icon-lx-cascades"></i> 排班信息管理
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
-        <!-- 路线表单 -->
+        <!-- 排班表单 -->
         <div class="container">
             <!-- 标题工具栏 -->
             <div class="handle-box">
                 <el-select v-model="query.mode" placeholder="查询模式" class="handle-select mr10">
-                    <el-option key="1" label="路线ID查询" value="id"></el-option>
-                    <el-option key="2" label="路线类型查询" value="type"></el-option>
+                    <el-option key="1" label="排班ID查询" value="id"></el-option>
+                    <el-option key="2" label="排班类型查询" value="type"></el-option>
                 </el-select>
                 <el-input v-model="query.options" placeholder="参数" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="success" icon="el-icon-plus" @click="handleAdd">添加路线</el-button>
+                <el-button type="success" icon="el-icon-plus" @click="handleAdd">添加排班</el-button>
             </div>
-            <!-- 路线表单 -->
-            <el-table :data="routeData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
-                <el-table-column prop="routeId" label="路线ID"  align="center"></el-table-column>
-                <el-table-column prop="startStation" label="起始站" align="center"></el-table-column>
-                <el-table-column prop="endStation" label="终点站" align="center"></el-table-column>
-                <el-table-column prop="stopStation" label="经停站" align="center"></el-table-column>
+            <!-- 排班表单 -->
+            <el-table :data="scheduleData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
+                <el-table-column prop="scheduleId" label="排班ID"  align="center"></el-table-column>
+                <el-table-column prop="startLocation" label="始发校区" align="center"></el-table-column>
+                <el-table-column prop="endLocation" label="终点校区" align="center"></el-table-column>
+                <el-table-column prop="routeId" label="路线ID" align="center"></el-table-column>
+                <el-table-column prop="startTime" label="发车时间" align="center"></el-table-column>
+                <el-table-column prop="date" label="发车日期" align="center"></el-table-column>
+                <el-table-column prop="busId" label="车辆ID" align="center"></el-table-column>
+                <el-table-column prop="seatInfo" label="座位ID" align="center"></el-table-column>
                 <!-- 操作栏 -->
                 <el-table-column label="操作" width="180" align="center">
                     <template #default="scope">
@@ -46,11 +50,11 @@
         <!-- 编辑弹出框 无校验 -->
         <el-dialog title="编辑" v-model="editVisible" width="30%">
             <el-form label-width="100px">
-                <el-form-item label="路线ID：">
-                    <el-input v-model="form.routeId" disabled placeholder=""></el-input>
+                <el-form-item label="排班ID：">
+                    <el-input v-model="form.scheduleId" disabled placeholder=""></el-input>
                 </el-form-item>
-                <el-form-item label="路线名称：">
-                    <el-input v-model="form.routeName" placeholder=""></el-input>
+                <el-form-item label="排班名称：">
+                    <el-input v-model="form.scheduleName" placeholder=""></el-input>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -62,14 +66,14 @@
         </el-dialog>
 
         <!-- 添加弹出框 有校验 -->
-        <el-dialog title="添加路线" v-model="addVisible" width="30%">
+        <el-dialog title="添加排班" v-model="addVisible" width="30%">
             <el-form :model="ruleForm" ref="ruleFormRef" :rules="addRules" label-width="100px">
             <!-- <el-form rules="rules" label-width="70px"> -->
-                <el-form-item label="路线ID：" prop="routeId">
-                    <el-input v-model="ruleForm.routeId" placeholder=""></el-input>
+                <el-form-item label="排班ID：" prop="scheduleId">
+                    <el-input v-model="ruleForm.scheduleId" placeholder=""></el-input>
                 </el-form-item>
-                <el-form-item label="路线名称：" prop="routeName">
-                    <el-input v-model="ruleForm.routeName" placeholder=""></el-input>
+                <el-form-item label="排班名称：" prop="scheduleName">
+                    <el-input v-model="ruleForm.scheduleName" placeholder=""></el-input>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -89,17 +93,17 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { getDataNoParam, getDataParam, insertData, deleteData, updateData } from "../../api/index";
 
 export default {
-    name: "routeTable",
+    name: "scheduleTable",
     setup() {
         // 可视化 相关数据
         const addVisible = ref(false);
         const editVisible = ref(false);
         // data 相关数据
-        const routeData = ref([]);
+        const scheduleData = ref([]);
         const pageTotal = ref(0);
         const menu = ref([]);
         // request 相关数据
-        const path = "/route/queryRoute";
+        const path = "/schedule/querySchedule";
         const query = reactive({
             mode:"id",
             options:"all",          
@@ -109,16 +113,16 @@ export default {
         });
         // 表单
         const form = reactive({
-            routeId:"",
-            routeName: "",
+            scheduleId:"",
+            scheduleName: "",
         });
         // 规则校验表单
         const ruleForm = reactive({
-            routeId:"",
-            routeName: "",
+            scheduleId:"",
+            scheduleName: "",
         });
         const deleteParam = reactive({
-             routeId:"",
+             scheduleId:"",
         })
         // 表单规则
         const ruleFormRef = ref()
@@ -135,12 +139,12 @@ export default {
         }
 
         const addRules = reactive({
-            routeId: [
-                { required: true, message: '请输入路线ID', trigger: 'blur' },
+            scheduleId: [
+                { required: true, message: '请输入排班ID', trigger: 'blur' },
             ],
 
-            routeName: [
-                { required: true, message: '请输入路线！', trigger: 'blur' },
+            scheduleName: [
+                { required: true, message: '请输入排班！', trigger: 'blur' },
                 { min: 2, max: 20, message: '名称长度应介于2到20之间', trigger: 'blur' },
                 { type: 'string', message: '请输入汉字！', trigger: 'blur' },
             ],
@@ -152,7 +156,7 @@ export default {
         const getFormData = () => {
             getDataParam(query,path).then((res) => {
                 console.log(res)
-                routeData.value = res.data
+                scheduleData.value = res.data
                 pageTotal.value = res.pageTotal || 10
             });
         };
@@ -163,23 +167,23 @@ export default {
                 menu.value = res.data
             });
         }
-        // 添加路线数据
-        const addRouteData = (data) => {
-            insertData(data,"/route/createRoute").then((res) => {
+        // 添加排班数据
+        const addScheduleData = (data) => {
+            insertData(data,"/schedule/createSchedule").then((res) => {
                 console.log(res.data);
             });
         }
-        // 更新路线数据
-        const updateRouteData = (data) => {
-            updateData(data,"/reg/updateRoute").then((res) => {
+        // 更新排班数据
+        const updateScheduleData = (data) => {
+            updateData(data,"/reg/updateSchedule").then((res) => {
                 console.log(res.data)
                 // refresh;
             });
         }
 
-        // 删除路线数据
-        const deleteRouteData = (data) => {
-            deleteData(data,"/route/deleteRoute").then((res) => {
+        // 删除排班数据
+        const deleteScheduleData = (data) => {
+            deleteData(data,"/schedule/deleteSchedule").then((res) => {
                 console.log(res.data)
                 // refresh;
             });
@@ -215,8 +219,8 @@ export default {
                 type: "warning",
             })
             .then(() => {
-                deleteParam.routeId = row.routeId
-                deleteRouteData(deleteParam);
+                deleteParam.scheduleId = row.scheduleId
+                deleteScheduleData(deleteParam);
                 ElMessage.success("删除成功");
                 getFormData();
             })
@@ -233,7 +237,7 @@ export default {
         const saveCreate = () => {
             addVisible.value = false;
             console.log(ruleForm)
-            addRouteData(ruleForm);
+            addScheduleData(ruleForm);
             ElMessage.success(`添加新用户成功`);
             getFormData();
         }
@@ -255,7 +259,7 @@ export default {
 
         return {
             query,
-            routeData,
+            scheduleData,
             pageTotal,
             editVisible,
             addVisible,

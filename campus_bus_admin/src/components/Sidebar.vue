@@ -58,11 +58,19 @@ export default {
                     },
                     {
                         index: "/bus",
-                        title: "车辆管理",
+                        title: "校车管理",
                     },
                     {
-                        index: "/employment_reg",
-                        title: "就业信息管理",
+                        index: "/route",
+                        title: "路线管理",
+                    },
+                    {
+                        index: "/schedule",
+                        title: "排班管理",
+                    },
+                    {
+                        index: "/order",
+                        title: "订单管理",
                     },
                 ],
             },

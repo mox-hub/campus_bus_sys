@@ -17,21 +17,32 @@ const routes = [
                     title: '系统首页'
                 },
                 component: () => import ( /* webpackChunkName: "dashboard" */ "../views/Dashboard.vue")
-            }, {
+            }, 
+            {
                 path: "/tabs",
                 name: "tabs",
                 meta: {
                     title: 'tab标签'
                 },
                 component: () => import ( /* webpackChunkName: "tabs" */ "../views/Tabs.vue")
-            }, {
-                path: '/user',
-                name: 'user',
+            }, 
+            {
+                path: '/my',
+                name: 'my',
                 meta: {
                     title: '个人中心'
                 },
                 component: () => import (/* webpackChunkName: "user" */ '../views/User.vue')
-            }, {
+            }, 
+            {
+                path: '/bus',
+                name: 'bus',
+                meta: {
+                    title: '车辆管理'
+                },
+                component: () => import (/* webpackChunkName: "editor" */ '../views/admin/BusTable.vue')
+            },
+            {
                 path: '/campus',
                 name: 'campus',
                 meta: {
@@ -40,12 +51,28 @@ const routes = [
                 component: () => import (/* webpackChunkName: "editor" */ '../views/admin/CampusTable.vue')
             },
             {
-                path: '/bus',
-                name: 'bus',
+                path: '/order',
+                name: 'order',
                 meta: {
-                    title: '车辆管理'
+                    title: '订单管理'
                 },
-                component: () => import (/* webpackChunkName: "editor" */ '../views/admin/BusTable.vue')
+                component: () => import (/* webpackChunkName: "editor" */ '../views/admin/OrderTable.vue')
+            },
+            {
+                path: '/route',
+                name: 'route',
+                meta: {
+                    title: '路线管理'
+                },
+                component: () => import (/* webpackChunkName: "editor" */ '../views/admin/RouteTable.vue')
+            },
+            {
+                path: '/schedule',
+                name: 'schedule',
+                meta: {
+                    title: '排班管理'
+                },
+                component: () => import (/* webpackChunkName: "editor" */ '../views/admin/ScheduleTable.vue')
             },
             {
                 path: '/user',

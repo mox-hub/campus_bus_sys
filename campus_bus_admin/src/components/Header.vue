@@ -69,8 +69,8 @@ export default {
             if (command == "loginout") {
                 localStorage.removeItem("ms_username");
                 router.push("/login");
-            } else if (command == "user") {
-                router.push("/user");
+            } else if (command == "my") {
+                router.push("/my");
             }
         };
 
