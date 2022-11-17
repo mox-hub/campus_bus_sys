@@ -4,31 +4,28 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 就业登记管理
+                    <i class="el-icon-lx-cascades"></i> 校车信息管理
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
-        <!-- 就业登记表单 -->
+        <!-- 校车表单 -->
         <div class="container">
             <!-- 标题工具栏 -->
             <div class="handle-box">
                 <el-select v-model="query.mode" placeholder="查询模式" class="handle-select mr10">
-                    <el-option key="1" label="登记ID查询" value="uid"></el-option>
-                    <el-option key="2" label="工作ID查询" value="jid"></el-option>
-                    <el-option key="3" label="公司ID查询" value="cid"></el-option>
+                    <el-option key="1" label="校车ID查询" value="id"></el-option>
+                    <el-option key="2" label="校车类型查询" value="type"></el-option>
                 </el-select>
-                <el-cascader v-if="query.mode ==='prof'" :options="menu" clearable :props="{emitPath:false}" v-model="query.options" placeholder="系别" :show-all-levels="false" class="handle-select mr10"></el-cascader>
-                <el-input v-else v-model="query.options" placeholder="参数" class="handle-input mr10"></el-input>
+                <el-input v-model="query.options" placeholder="参数" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="success" icon="el-icon-plus" @click="handleAdd">添加用户</el-button>
+                <el-button type="success" icon="el-icon-plus" @click="handleAdd">添加校车</el-button>
             </div>
-            <!-- 就业登记表单 -->
-            <el-table :data="registrationData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
-                <el-table-column prop="registrationId" label="登记表ID"  align="center"></el-table-column>
-                <el-table-column prop="jobId" label="工作ID" align="center"></el-table-column>
-                <el-table-column prop="companyId" label="公司ID" align="center"></el-table-column>
-                <el-table-column prop="requiredNum" label="需求数量" align="center"></el-table-column>
-                <el-table-column prop="hiresNum" label="已招聘数量" align="center"></el-table-column>
+            <!-- 校车表单 -->
+            <el-table :data="busData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
+                <el-table-column prop="busId" label="校车ID"  align="center"></el-table-column>
+                <el-table-column prop="busName" label="校车名称" align="center"></el-table-column>
+                <el-table-column prop="busImage" label="校车图片" align="center"></el-table-column>
+                <el-table-column prop="busType" label="校车类型" align="center"></el-table-column>
                 <!-- 操作栏 -->
                 <el-table-column label="操作" width="180" align="center">
                     <template #default="scope">
@@ -48,22 +45,12 @@
 
         <!-- 编辑弹出框 无校验 -->
         <el-dialog title="编辑" v-model="editVisible" width="30%">
-            <el-form :model="form" label-width="100px">
-            <!-- <el-form rules="rules" label-width="70px"> -->
-                <el-form-item label="需求表ID：" prop="registrationId">
-                    <el-input v-model="form.registrationId" placeholder=""></el-input>
+            <el-form label-width="100px">
+                <el-form-item label="校车ID：">
+                    <el-input v-model="form.busId" disabled placeholder=""></el-input>
                 </el-form-item>
-                <el-form-item label="公司名称：" prop="companyId">
-                    <el-cascader :options="companyMenu" :props="{emitPath:false}" clearable v-model="form.companyId" placeholder="系别" style="width:350px" class="handle-select mr10"></el-cascader>
-                </el-form-item>
-                <el-form-item label="工作类型：" prop="JobId">
-                    <el-cascader :options="jobMenu" :props="{emitPath:false}" clearable v-model="form.jobId" placeholder="系别" style="width:350px" class="handle-select mr10"></el-cascader>
-                </el-form-item>
-                <el-form-item label="需求数量：" prop="requiredNum">
-                    <el-input-number v-model="form.requiredNum" :min="1" :max="100" @change="handleChange" />
-                </el-form-item>
-                <el-form-item label="已登记数量" prop="hiresNum">
-                    <el-input v-model="form.hiresNum" disabled placeholder=""></el-input>
+                <el-form-item label="校车名称：">
+                    <el-input v-model="form.busName" placeholder=""></el-input>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -75,23 +62,14 @@
         </el-dialog>
 
         <!-- 添加弹出框 有校验 -->
-        <el-dialog title="添加需求登记" v-model="addVisible" width="30%">
+        <el-dialog title="添加校车" v-model="addVisible" width="30%">
             <el-form :model="ruleForm" ref="ruleFormRef" :rules="addRules" label-width="100px">
             <!-- <el-form rules="rules" label-width="70px"> -->
-                <el-form-item label="需求表ID：" prop="registrationId">
-                    <el-input v-model="ruleForm.registrationId" placeholder=""></el-input>
+                <el-form-item label="校车ID：" prop="busId">
+                    <el-input v-model="ruleForm.busId" placeholder=""></el-input>
                 </el-form-item>
-                <el-form-item label="公司名称：" prop="companyId">
-                    <el-cascader :options="companyMenu" :props="{emitPath:false}" clearable v-model="ruleForm.companyId" placeholder="系别" style="width:350px" class="handle-select mr10"></el-cascader>
-                </el-form-item>
-                <el-form-item label="工作类型：" prop="JobId">
-                    <el-cascader :options="jobMenu" :props="{emitPath:false}" clearable v-model="ruleForm.jobId" placeholder="系别" style="width:350px" class="handle-select mr10"></el-cascader>
-                </el-form-item>
-                <el-form-item label="需求数量：" prop="requiredNum">
-                    <el-input-number v-model="ruleForm.requiredNum" :min="1" :max="100" @change="handleChange" />
-                </el-form-item>
-                <el-form-item label="已登记数量" prop="hiresNum">
-                    <el-input v-model="ruleForm.hiresNum" disabled placeholder=""></el-input>
+                <el-form-item label="校车名称：" prop="busName">
+                    <el-input v-model="ruleForm.busName" placeholder=""></el-input>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -111,21 +89,19 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { getDataNoParam, getDataParam, insertData, deleteData, updateData } from "../../api/index";
 
 export default {
-    name: "registrationTable",
+    name: "busTable",
     setup() {
         // 可视化 相关数据
         const addVisible = ref(false);
         const editVisible = ref(false);
         // data 相关数据
-        const registrationData = ref([]);
+        const busData = ref([]);
         const pageTotal = ref(0);
         const menu = ref([]);
-        const companyMenu = ref([]);
-        const jobMenu = ref([])
         // request 相关数据
-        const path = "/reg/queryRegistration";
+        const path = "/bus/queryBus";
         const query = reactive({
-            mode:"uid",
+            mode:"id",
             options:"all",          
             pageIndex:1,
             pageSize:10,
@@ -133,23 +109,16 @@ export default {
         });
         // 表单
         const form = reactive({
-            registrationId:"",
-            jobId: "",
-            companyId: "",
-            requiredNum: 0,
-            hiresNum: 0,
+            busId:"",
+            busName: "",
         });
         // 规则校验表单
         const ruleForm = reactive({
-            registrationId:"",
-            jobId: "",
-            companyId: "",
-            requiredNum: 0,
-            hiresNum: 0,
+            busId:"",
+            busName: "",
         });
-        
         const deleteParam = reactive({
-            registrationId:"",
+             busId:"",
         })
         // 表单规则
         const ruleFormRef = ref()
@@ -166,9 +135,14 @@ export default {
         }
 
         const addRules = reactive({
-            registrationId: [
-                { required: true, message: '请输入需求登记ID', trigger: 'blur' },
-                { len: 8, message: 'ID长度应为8位！', trigger: 'blur' },
+            busId: [
+                { required: true, message: '请输入校车ID', trigger: 'blur' },
+            ],
+
+            busName: [
+                { required: true, message: '请输入校车！', trigger: 'blur' },
+                { min: 2, max: 20, message: '名称长度应介于2到20之间', trigger: 'blur' },
+                { type: 'string', message: '请输入汉字！', trigger: 'blur' },
             ],
         })
 
@@ -178,7 +152,7 @@ export default {
         const getFormData = () => {
             getDataParam(query,path).then((res) => {
                 console.log(res)
-                registrationData.value = res.data
+                busData.value = res.data
                 pageTotal.value = res.pageTotal || 10
             });
         };
@@ -188,31 +162,24 @@ export default {
                 console.log(res.data)
                 menu.value = res.data
             });
-            getDataNoParam("/company/getCascadeData").then((res) => {
-                console.log(res.data)
-                companyMenu.value = res.data
-            });
-            getDataNoParam("/job/getCascadeData").then((res) => {
-                console.log(res.data)
-                jobMenu.value = res.data
-            });
         }
-        // 添加毕业生数据
-        const addRegistrationData = (data) => {
-            insertData(data,"/reg/createRegistration").then((res) => {
+        // 添加校车数据
+        const addBusData = (data) => {
+            insertData(data,"/bus/createBus").then((res) => {
                 console.log(res.data);
             });
         }
-        // 更新毕业生数据
-        const updateRegistrationData = (data) => {
-            updateData(data,"/reg/updateRegistration").then((res) => {
+        // 更新校车数据
+        const updateBusData = (data) => {
+            updateData(data,"/reg/updateBus").then((res) => {
                 console.log(res.data)
                 // refresh;
             });
         }
-        // 删除毕业生数据
-        const deleteRegistrationData = (data) => {
-            deleteData(data,"/reg/deleteRegistration").then((res) => {
+
+        // 删除校车数据
+        const deleteBusData = (data) => {
+            deleteData(data,"/bus/deleteBus").then((res) => {
                 console.log(res.data)
                 // refresh;
             });
@@ -225,30 +192,11 @@ export default {
             query.pageIndex = val;
             getFormData();
         };
-
-        const handleChange = (value) => {
-            console.log(value)
-        }       
         // 添加操作
         const handleAdd = () => {
             addVisible.value = true;
         }
-        // 删除操作
-        const handleDelete = (index, row) => {
-            // 二次确认删除
-            ElMessageBox.confirm("确定要删除吗？", "提示", {
-                type: "warning",
-            })
-            .then(() => {
 
-                deleteParam.registrationId = row.registrationId
-                deleteRegistrationData(deleteParam);
-                ElMessage.success("删除成功");
-                getFormData();
-                // registrationData.value.splice(index, 1);
-            })
-            .catch(() => {});
-        };
         // 编辑操作
         let idx = -1;
         const handleEdit = (index, row) => {
@@ -259,11 +207,36 @@ export default {
             });
             editVisible.value = true;
         };
+
+        // 删除操作
+        const handleDelete = (index, row) => {
+            // 二次确认删除
+            ElMessageBox.confirm("确定要删除吗？", "提示", {
+                type: "warning",
+            })
+            .then(() => {
+                deleteParam.busId = row.busId
+                deleteBusData(deleteParam);
+                ElMessage.success("删除成功");
+                getFormData();
+            })
+            .catch(() => {});
+        };
+
         // 查询操作
         const handleSearch = () => {
             query.pageIndex = 1;
             getFormData();
         };
+
+        // 保存新增内容 
+        const saveCreate = () => {
+            addVisible.value = false;
+            console.log(ruleForm)
+            addBusData(ruleForm);
+            ElMessage.success(`添加新用户成功`);
+            getFormData();
+        }
 
         // 保存编辑内容
         const saveEdit = () => {
@@ -276,22 +249,13 @@ export default {
             ElMessage.success(`修改第 ${idx + 1} 行成功`);
             getFormData();
         };
-        // 保存新增内容 
-        const saveCreate = () => {
-            addVisible.value = false;
-            console.log(ruleForm)
-            addRegistrationData(ruleForm);
-            ElMessage.success(`添加新用户成功`);
-            getFormData();
-        }
-
         // setup时执行的函数
         getCascadeData();
         getFormData();
 
         return {
             query,
-            registrationData,
+            busData,
             pageTotal,
             editVisible,
             addVisible,
@@ -301,16 +265,13 @@ export default {
             deleteParam,
             addRules,
             menu,
-            companyMenu,
-            jobMenu,
             handlePageChange,
-            handleChange,
             handleDelete,
             handleSearch,
-            handleEdit,
             handleAdd,
-            saveEdit,
             saveCreate,
+            handleEdit,
+            saveEdit,
         };
     },
 };

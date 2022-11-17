@@ -32,19 +32,28 @@ const routes = [
                 },
                 component: () => import (/* webpackChunkName: "user" */ '../views/User.vue')
             }, {
-                path: '/employment_reg',
-                name: 'employment_reg',
-                meta: {
-                    title: '就业信息管理'
-                },
-                component: () => import (/* webpackChunkName: "editor" */ '../views/admin/EmploymentRegTable.vue')
-            }, {
                 path: '/campus',
                 name: 'campus',
                 meta: {
                     title: '校区管理'
                 },
                 component: () => import (/* webpackChunkName: "editor" */ '../views/admin/CampusTable.vue')
+            },
+            {
+                path: '/bus',
+                name: 'bus',
+                meta: {
+                    title: '车辆管理'
+                },
+                component: () => import (/* webpackChunkName: "editor" */ '../views/admin/BusTable.vue')
+            },
+            {
+                path: '/user',
+                name: 'user',
+                meta: {
+                    title: '用户管理'
+                },
+                component: () => import (/* webpackChunkName: "editor" */ '../views/admin/UserTable.vue')
             },
         ]
     }, {

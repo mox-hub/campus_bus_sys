@@ -4,29 +4,33 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 校区信息管理
+                    <i class="el-icon-lx-cascades"></i> 校车信息管理
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
-        <!-- 校区表单 -->
+        <!-- 校车表单 -->
         <div class="container">
             <!-- 标题工具栏 -->
             <div class="handle-box">
                 <el-select v-model="query.mode" placeholder="查询模式" class="handle-select mr10">
-                    <el-option key="1" label="校区ID查询" value="id"></el-option>
-                    <el-option key="2" label="校区名查询" value="name"></el-option>
+                    <el-option key="1" label="校车ID查询" value="id"></el-option>
+                    <el-option key="2" label="校车类型查询" value="type"></el-option>
                 </el-select>
                 <el-input v-model="query.options" placeholder="参数" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="success" icon="el-icon-plus" @click="handleAdd">添加校区</el-button>
+                <el-button type="success" icon="el-icon-plus" @click="handleAdd">添加校车</el-button>
             </div>
-            <!-- 校区表单 -->
-            <el-table :data="campusData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
-                <el-table-column prop="campusId" label="校区ID"  align="center"></el-table-column>
-                <el-table-column prop="campusName" label="校区名称" align="center"></el-table-column>
+            <!-- 校车表单 -->
+            <el-table :data="busData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
+                <el-table-column prop="busId" label="校车ID"  align="center"></el-table-column>
+                <el-table-column prop="busName" label="校车名称" align="center"></el-table-column>
+                <el-table-column prop="busImage" label="校车图片" align="center"></el-table-column>
+                <el-table-column prop="busType" label="校车类型" align="center"></el-table-column>
                 <!-- 操作栏 -->
                 <el-table-column label="操作" width="180" align="center">
                     <template #default="scope">
+                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑
+                        </el-button>
                         <el-button type="text" icon="el-icon-delete" class="red"
                             @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
@@ -42,11 +46,11 @@
         <!-- 编辑弹出框 无校验 -->
         <el-dialog title="编辑" v-model="editVisible" width="30%">
             <el-form label-width="100px">
-                <el-form-item label="校区ID：">
-                    <el-input v-model="form.campusId" disabled placeholder=""></el-input>
+                <el-form-item label="校车ID：">
+                    <el-input v-model="form.busId" disabled placeholder=""></el-input>
                 </el-form-item>
-                <el-form-item label="校区名称：">
-                    <el-input v-model="form.campusName" placeholder=""></el-input>
+                <el-form-item label="校车名称：">
+                    <el-input v-model="form.busName" placeholder=""></el-input>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -58,14 +62,14 @@
         </el-dialog>
 
         <!-- 添加弹出框 有校验 -->
-        <el-dialog title="添加校区" v-model="addVisible" width="30%">
+        <el-dialog title="添加校车" v-model="addVisible" width="30%">
             <el-form :model="ruleForm" ref="ruleFormRef" :rules="addRules" label-width="100px">
             <!-- <el-form rules="rules" label-width="70px"> -->
-                <el-form-item label="校区ID：" prop="campusId">
-                    <el-input v-model="ruleForm.campusId" placeholder=""></el-input>
+                <el-form-item label="校车ID：" prop="busId">
+                    <el-input v-model="ruleForm.busId" placeholder=""></el-input>
                 </el-form-item>
-                <el-form-item label="校区名称：" prop="campusName">
-                    <el-input v-model="ruleForm.campusName" placeholder=""></el-input>
+                <el-form-item label="校车名称：" prop="busName">
+                    <el-input v-model="ruleForm.busName" placeholder=""></el-input>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -85,17 +89,17 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { getDataNoParam, getDataParam, insertData, deleteData, updateData } from "../../api/index";
 
 export default {
-    name: "campusTable",
+    name: "busTable",
     setup() {
         // 可视化 相关数据
         const addVisible = ref(false);
         const editVisible = ref(false);
         // data 相关数据
-        const campusData = ref([]);
+        const busData = ref([]);
         const pageTotal = ref(0);
         const menu = ref([]);
         // request 相关数据
-        const path = "/campus/queryCampus";
+        const path = "/bus/queryBus";
         const query = reactive({
             mode:"id",
             options:"all",          
@@ -105,16 +109,16 @@ export default {
         });
         // 表单
         const form = reactive({
-            campusId:"",
-            campusName: "",
+            busId:"",
+            busName: "",
         });
         // 规则校验表单
         const ruleForm = reactive({
-            campusId:"",
-            campusName: "",
+            busId:"",
+            busName: "",
         });
         const deleteParam = reactive({
-             campusId:"",
+             busId:"",
         })
         // 表单规则
         const ruleFormRef = ref()
@@ -131,12 +135,12 @@ export default {
         }
 
         const addRules = reactive({
-            campusId: [
-                { required: true, message: '请输入校区ID', trigger: 'blur' },
+            busId: [
+                { required: true, message: '请输入校车ID', trigger: 'blur' },
             ],
 
-            campusName: [
-                { required: true, message: '请输入校区！', trigger: 'blur' },
+            busName: [
+                { required: true, message: '请输入校车！', trigger: 'blur' },
                 { min: 2, max: 20, message: '名称长度应介于2到20之间', trigger: 'blur' },
                 { type: 'string', message: '请输入汉字！', trigger: 'blur' },
             ],
@@ -148,7 +152,7 @@ export default {
         const getFormData = () => {
             getDataParam(query,path).then((res) => {
                 console.log(res)
-                campusData.value = res.data
+                busData.value = res.data
                 pageTotal.value = res.pageTotal || 10
             });
         };
@@ -159,15 +163,23 @@ export default {
                 menu.value = res.data
             });
         }
-        // 添加校区数据
-        const addCampusData = (data) => {
-            insertData(data,"/campus/createCampus").then((res) => {
+        // 添加校车数据
+        const addBusData = (data) => {
+            insertData(data,"/bus/createBus").then((res) => {
                 console.log(res.data);
             });
         }
-        // 删除校区数据
-        const deleteCampusData = (data) => {
-            deleteData(data,"/campus/deleteCampus").then((res) => {
+        // 更新校车数据
+        const updateBusData = (data) => {
+            updateData(data,"/reg/updateBus").then((res) => {
+                console.log(res.data)
+                // refresh;
+            });
+        }
+
+        // 删除校车数据
+        const deleteBusData = (data) => {
+            deleteData(data,"/bus/deleteBus").then((res) => {
                 console.log(res.data)
                 // refresh;
             });
@@ -184,6 +196,18 @@ export default {
         const handleAdd = () => {
             addVisible.value = true;
         }
+
+        // 编辑操作
+        let idx = -1;
+        const handleEdit = (index, row) => {
+            idx = index;
+            Object.keys(form).forEach((item) => {
+                form[item] = row[item];
+                console.log(form[item]);
+            });
+            editVisible.value = true;
+        };
+
         // 删除操作
         const handleDelete = (index, row) => {
             // 二次确认删除
@@ -191,8 +215,8 @@ export default {
                 type: "warning",
             })
             .then(() => {
-                deleteParam.campusId = row.campusId
-                deleteCampusData(deleteParam);
+                deleteParam.busId = row.busId
+                deleteBusData(deleteParam);
                 ElMessage.success("删除成功");
                 getFormData();
             })
@@ -209,18 +233,29 @@ export default {
         const saveCreate = () => {
             addVisible.value = false;
             console.log(ruleForm)
-            addCampusData(ruleForm);
+            addBusData(ruleForm);
             ElMessage.success(`添加新用户成功`);
             getFormData();
         }
 
+        // 保存编辑内容
+        const saveEdit = () => {
+            editVisible.value = false;
+            Object.keys(form).forEach((item) => {
+                registrationData.value[idx][item] = form[item];
+            });
+            console.log(registrationData.value[idx])
+            updateRegistrationData(registrationData.value[idx]);
+            ElMessage.success(`修改第 ${idx + 1} 行成功`);
+            getFormData();
+        };
         // setup时执行的函数
         getCascadeData();
         getFormData();
 
         return {
             query,
-            campusData,
+            busData,
             pageTotal,
             editVisible,
             addVisible,
@@ -235,6 +270,8 @@ export default {
             handleSearch,
             handleAdd,
             saveCreate,
+            handleEdit,
+            saveEdit,
         };
     },
 };

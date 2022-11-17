@@ -4,26 +4,30 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 校区信息管理
+                    <i class="el-icon-lx-cascades"></i> 用户信息管理
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
-        <!-- 校区表单 -->
+        <!-- 用户表单 -->
         <div class="container">
             <!-- 标题工具栏 -->
             <div class="handle-box">
                 <el-select v-model="query.mode" placeholder="查询模式" class="handle-select mr10">
-                    <el-option key="1" label="校区ID查询" value="id"></el-option>
-                    <el-option key="2" label="校区名查询" value="name"></el-option>
+                    <el-option key="1" label="用户名查询" value="name"></el-option>
+                    <el-option key="2" label="用户ID查询" value="id"></el-option>
                 </el-select>
                 <el-input v-model="query.options" placeholder="参数" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="success" icon="el-icon-plus" @click="handleAdd">添加校区</el-button>
+                <el-button type="success" icon="el-icon-plus" @click="handleAdd">添加用户</el-button>
             </div>
-            <!-- 校区表单 -->
-            <el-table :data="campusData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
-                <el-table-column prop="campusId" label="校区ID"  align="center"></el-table-column>
-                <el-table-column prop="campusName" label="校区名称" align="center"></el-table-column>
+            <!-- 用户表单 -->
+            <el-table :data="userData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
+                <el-table-column prop="userId" label="用户ID"  align="center"></el-table-column>
+                <el-table-column prop="userName" label="用户名称" align="center"></el-table-column>
+                <el-table-column prop="avatar" label="用户头像" align="center"></el-table-column>
+                <el-table-column prop="phone" label="联系方式" align="center"></el-table-column>
+                <el-table-column prop="workId" label="学工号" align="center"></el-table-column>
+                <el-table-column prop="campusId" label="校区" align="center"></el-table-column>
                 <!-- 操作栏 -->
                 <el-table-column label="操作" width="180" align="center">
                     <template #default="scope">
@@ -42,11 +46,11 @@
         <!-- 编辑弹出框 无校验 -->
         <el-dialog title="编辑" v-model="editVisible" width="30%">
             <el-form label-width="100px">
-                <el-form-item label="校区ID：">
-                    <el-input v-model="form.campusId" disabled placeholder=""></el-input>
+                <el-form-item label="用户ID：">
+                    <el-input v-model="form.userId" disabled placeholder=""></el-input>
                 </el-form-item>
-                <el-form-item label="校区名称：">
-                    <el-input v-model="form.campusName" placeholder=""></el-input>
+                <el-form-item label="用户名称：">
+                    <el-input v-model="form.userName" placeholder=""></el-input>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -58,14 +62,14 @@
         </el-dialog>
 
         <!-- 添加弹出框 有校验 -->
-        <el-dialog title="添加校区" v-model="addVisible" width="30%">
+        <el-dialog title="添加用户" v-model="addVisible" width="30%">
             <el-form :model="ruleForm" ref="ruleFormRef" :rules="addRules" label-width="100px">
             <!-- <el-form rules="rules" label-width="70px"> -->
-                <el-form-item label="校区ID：" prop="campusId">
-                    <el-input v-model="ruleForm.campusId" placeholder=""></el-input>
+                <el-form-item label="用户ID：" prop="userId">
+                    <el-input v-model="ruleForm.userId" placeholder=""></el-input>
                 </el-form-item>
-                <el-form-item label="校区名称：" prop="campusName">
-                    <el-input v-model="ruleForm.campusName" placeholder=""></el-input>
+                <el-form-item label="用户名称：" prop="userName">
+                    <el-input v-model="ruleForm.userName" placeholder=""></el-input>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -85,19 +89,19 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { getDataNoParam, getDataParam, insertData, deleteData, updateData } from "../../api/index";
 
 export default {
-    name: "campusTable",
+    name: "userTable",
     setup() {
         // 可视化 相关数据
         const addVisible = ref(false);
         const editVisible = ref(false);
         // data 相关数据
-        const campusData = ref([]);
+        const userData = ref([]);
         const pageTotal = ref(0);
         const menu = ref([]);
         // request 相关数据
-        const path = "/campus/queryCampus";
+        const path = "/user/queryUser";
         const query = reactive({
-            mode:"id",
+            mode:"uid",
             options:"all",          
             pageIndex:1,
             pageSize:10,
@@ -105,16 +109,16 @@ export default {
         });
         // 表单
         const form = reactive({
-            campusId:"",
-            campusName: "",
+            userId:"",
+            userName: "",
         });
         // 规则校验表单
         const ruleForm = reactive({
-            campusId:"",
-            campusName: "",
+            userId:"",
+            userName: "",
         });
         const deleteParam = reactive({
-             campusId:"",
+             userId:"",
         })
         // 表单规则
         const ruleFormRef = ref()
@@ -131,12 +135,12 @@ export default {
         }
 
         const addRules = reactive({
-            campusId: [
-                { required: true, message: '请输入校区ID', trigger: 'blur' },
+            userId: [
+                { required: true, message: '请输入用户ID', trigger: 'blur' },
             ],
 
-            campusName: [
-                { required: true, message: '请输入校区！', trigger: 'blur' },
+            userName: [
+                { required: true, message: '请输入用户！', trigger: 'blur' },
                 { min: 2, max: 20, message: '名称长度应介于2到20之间', trigger: 'blur' },
                 { type: 'string', message: '请输入汉字！', trigger: 'blur' },
             ],
@@ -148,7 +152,7 @@ export default {
         const getFormData = () => {
             getDataParam(query,path).then((res) => {
                 console.log(res)
-                campusData.value = res.data
+                userData.value = res.data
                 pageTotal.value = res.pageTotal || 10
             });
         };
@@ -159,15 +163,15 @@ export default {
                 menu.value = res.data
             });
         }
-        // 添加校区数据
-        const addCampusData = (data) => {
-            insertData(data,"/campus/createCampus").then((res) => {
+        // 添加用户数据
+        const addUserData = (data) => {
+            insertData(data,"/user/createUser").then((res) => {
                 console.log(res.data);
             });
         }
-        // 删除校区数据
-        const deleteCampusData = (data) => {
-            deleteData(data,"/campus/deleteCampus").then((res) => {
+        // 删除用户数据
+        const deleteUserData = (data) => {
+            deleteData(data,"/user/deleteUser").then((res) => {
                 console.log(res.data)
                 // refresh;
             });
@@ -191,8 +195,8 @@ export default {
                 type: "warning",
             })
             .then(() => {
-                deleteParam.campusId = row.campusId
-                deleteCampusData(deleteParam);
+                deleteParam.userId = row.userId
+                deleteUserData(deleteParam);
                 ElMessage.success("删除成功");
                 getFormData();
             })
@@ -209,7 +213,7 @@ export default {
         const saveCreate = () => {
             addVisible.value = false;
             console.log(ruleForm)
-            addCampusData(ruleForm);
+            addUserData(ruleForm);
             ElMessage.success(`添加新用户成功`);
             getFormData();
         }
@@ -220,7 +224,7 @@ export default {
 
         return {
             query,
-            campusData,
+            userData,
             pageTotal,
             editVisible,
             addVisible,

@@ -49,8 +49,16 @@ export default {
                 title: "管理员功能",
                 subs: [
                     {
+                        index: "/user",
+                        title: "用户管理",
+                    },
+                    {
                         index: "/campus",
                         title: "校区管理",
+                    },
+                    {
+                        index: "/bus",
+                        title: "车辆管理",
                     },
                     {
                         index: "/employment_reg",
