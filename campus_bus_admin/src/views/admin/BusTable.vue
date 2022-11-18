@@ -16,7 +16,7 @@
                     <el-option key="1" label="校车ID查询" value="id"></el-option>
                     <el-option key="2" label="校车类型查询" value="type"></el-option>
                 </el-select>
-                <el-input v-model="query.options" placeholder="参数" class="handle-input mr10"></el-input>
+                <el-input  v-model="query.options" placeholder="参数" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
                 <el-button type="success" icon="el-icon-plus" @click="handleAdd">添加校车</el-button>
             </div>
@@ -57,6 +57,12 @@
                 <el-form-item label="校车名称：">
                     <el-input v-model="form.busName" placeholder=""></el-input>
                 </el-form-item>
+                <el-form-item label="校车图片：">
+                    <el-input v-model="form.busImage" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="校车类型：">
+                    <el-input v-model="form.busType" placeholder=""></el-input>
+                </el-form-item>
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
@@ -75,6 +81,12 @@
                 </el-form-item>
                 <el-form-item label="校车名称：" prop="busName">
                     <el-input v-model="ruleForm.busName" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="校车图片：" prop="busImage">
+                    <el-input v-model="ruleForm.busImage" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="校车类型：" prop="busType">
+                    <el-input v-model="ruleForm.busType" placeholder=""></el-input>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -103,6 +115,9 @@ export default {
         const busData = ref([]);
         const pageTotal = ref(0);
         const menu = ref([]);
+        // 设定行列的初值
+        const row = ref(4);
+        const column = ref(9);
         // request 相关数据
         const path = "/bus/queryBus";
         const query = reactive({
@@ -110,21 +125,26 @@ export default {
             options:"all",          
             pageIndex:1,
             pageSize:10,
-
         });
         // 表单
         const form = reactive({
             busId:"",
             busName: "",
+            busImage: "",
+            busType: "",
         });
         // 规则校验表单
         const ruleForm = reactive({
             busId:"",
             busName: "",
+            busImage: "",
+            busType: "",
         });
+
         const deleteParam = reactive({
              busId:"",
         })
+
         // 表单规则
         const ruleFormRef = ref()
         // 自定义验证规则
@@ -161,13 +181,7 @@ export default {
                 pageTotal.value = res.pageTotal || 10
             });
         };
-        // 获取级联表单的数据
-        const getCascadeData = () => {
-            getDataNoParam("/dept/getCascadeData").then((res) => {
-                console.log(res.data)
-                menu.value = res.data
-            });
-        }
+
         // 添加校车数据
         const addBusData = (data) => {
             insertData(data,"/bus/createBus").then((res) => {
@@ -247,15 +261,14 @@ export default {
         const saveEdit = () => {
             editVisible.value = false;
             Object.keys(form).forEach((item) => {
-                registrationData.value[idx][item] = form[item];
+                busData.value[idx][item] = form[item];
             });
-            console.log(registrationData.value[idx])
-            updateRegistrationData(registrationData.value[idx]);
+            console.log(busData.value[idx])
+            updateBusData(busData.value[idx]);
             ElMessage.success(`修改第 ${idx + 1} 行成功`);
             getFormData();
         };
         // setup时执行的函数
-        getCascadeData();
         getFormData();
 
         return {
@@ -270,6 +283,8 @@ export default {
             deleteParam,
             addRules,
             menu,
+            row,
+            column,
             handlePageChange,
             handleDelete,
             handleSearch,

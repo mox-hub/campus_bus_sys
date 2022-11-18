@@ -142,6 +142,7 @@ export default {
             pageIndex: 1,
             pageSize: 10,
         });
+
         // 表单
         const form = reactive({
             routeId: "",
@@ -156,23 +157,15 @@ export default {
             endStation: "",
             stopStation: [],
         });
+
         const deleteParam = reactive({
             routeId: "",
         });
+
         // 表单规则
         const ruleFormRef = ref();
+
         // 自定义验证规则
-        const validatePass = (rule, value, callback) => {
-            //  密码只能由大小写英文字母或数字开头，且由大小写英文字母_.组成
-            const reg = /^[A-Za-z0-9][A-Za-z0-9_.]{5,14}$/;
-            console.log("reg", value.match(reg));
-            if (!value.match(reg)) {
-                callback(new Error("密码由字母或数字开头，且只能为字母,数字,下划线及（.）"));
-            }
-            else {
-                callback();
-            }
-        };
         const addRules = reactive({
             routeId: [
                 { required: true, message: "请输入路线ID", trigger: "blur" },
@@ -188,6 +181,7 @@ export default {
                 { type: "string", message: "请输入汉字！", trigger: "blur" },
             ],
         });
+        
         /** 定义方法 */
         // 获取表格数据
         const getFormData = () => {

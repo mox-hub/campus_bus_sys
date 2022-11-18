@@ -14,9 +14,17 @@
             <div class="handle-box">
                 <el-select v-model="query.mode" placeholder="查询模式" class="handle-select mr10">
                     <el-option key="1" label="排班ID查询" value="id"></el-option>
-                    <el-option key="2" label="排班类型查询" value="type"></el-option>
+                    <el-option key="2" label="发车区间查询" value="location"></el-option>
+                    <el-option key="3" label="始发站查询" value="startLocation"></el-option>
+                    <el-option key="4" label="终点查询" value="endLocation"></el-option>    
                 </el-select>
-                <el-input v-model="query.options" placeholder="参数" class="handle-input mr10"></el-input>
+                <el-input v-if="query.mode == 'id'" v-model="query.options" placeholder="参数" class="handle-input mr10"></el-input>
+                <el-select v-if="query.mode == 'location' ||query.mode == 'startLocation'" v-model="query.startLocation" placeholder="始发站" class="handle-select mr10">
+                    <el-option v-for="campus in campusData" :key="campus.campusId" :label="campus.campusName" :value="campus.campusName" />
+                </el-select>
+                <el-select v-if="query.mode == 'location' ||query.mode == 'endLocation'" v-model="query.endLocation" placeholder="终点站" class="handle-select mr10">
+                    <el-option v-for="campus in campusData" :key="campus.campusId" :label="campus.campusName" :value="campus.campusName" />
+                </el-select>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
                 <el-button type="success" icon="el-icon-plus" @click="handleAdd">添加排班</el-button>
             </div>
@@ -26,8 +34,19 @@
                 <el-table-column prop="startLocation" label="始发校区" align="center"></el-table-column>
                 <el-table-column prop="endLocation" label="终点校区" align="center"></el-table-column>
                 <el-table-column prop="routeId" label="路线ID" align="center"></el-table-column>
-                <el-table-column prop="startTime" label="发车时间" align="center"></el-table-column>
-                <el-table-column prop="date" label="发车日期" align="center"></el-table-column>
+                <el-table-column label="发车时间" align="center">
+                    <template #default="scope">
+                        <el-tag>
+                            {{ scope.row.startTime }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="date" label="发车星期" align="center">
+                    <template #default="scope">
+                        <el-tag v-if="scope.row.date == ''" type="info">没有日期</el-tag>
+                        <el-tag v-else v-for="day in scope.row.date" :key="day" type="success" round>{{ day }}</el-tag>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="busId" label="车辆ID" align="center"></el-table-column>
                 <el-table-column prop="seatInfo" label="座位ID" align="center"></el-table-column>
                 <!-- 操作栏 -->
@@ -53,9 +72,44 @@
                 <el-form-item label="排班ID：">
                     <el-input v-model="form.scheduleId" disabled placeholder=""></el-input>
                 </el-form-item>
-                <el-form-item label="排班名称：">
-                    <el-input v-model="form.scheduleName" placeholder=""></el-input>
+                <el-form-item label="始发校区：">
+                    <el-select v-model="form.startLocation" placeholder="始发校区" class="handle-select mr10">
+                        <el-option v-for="data in campusData" :key="data.campusId" :label="data.campusName" :value="data.campusName" />
+                    </el-select>
                 </el-form-item>
+                <el-form-item label="终点校区：">
+                    <el-select v-model="form.endLocation" placeholder="终点校区" class="handle-select mr10">
+                        <el-option v-for="data in campusData" :key="data.campusId" :label="data.campusName" :value="data.campusName" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="路线ID：">
+                    <el-select v-model="form.routeId" placeholder="请选择路线号" class="handle-select mr10">
+                        <el-option v-for="route in routeData" :key="route.routeId" :label="route.routeId" :value="route.routeId" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="发车时间：">
+                    <el-time-picker v-model="value" placeholder="请选择发车时间"/>
+                    <el-input v-model="form.startTime" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="发车星期：">
+                    <el-checkbox-group v-model="form.date" border>
+                        <el-checkbox label="1" />
+                        <el-checkbox label="2" />
+                        <el-checkbox label="3" />
+                        <el-checkbox label="4" />
+                        <el-checkbox label="5" />
+                        <el-checkbox label="6" />
+                        <el-checkbox label="7" />
+                    </el-checkbox-group>
+                </el-form-item>
+                <el-form-item label="车辆ID：">
+                    <el-select v-model="form.busId" placeholder="终点校区" class="handle-select mr10">
+                        <el-option v-for="bus in busData" :key="bus.busId" :label="bus.busName" :value="bus.busId" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="座位号：">
+                    <el-input v-model="form.seatInfo" placeholder="" disabled></el-input>
+                </el-form-item>              
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
@@ -72,9 +126,27 @@
                 <el-form-item label="排班ID：" prop="scheduleId">
                     <el-input v-model="ruleForm.scheduleId" placeholder=""></el-input>
                 </el-form-item>
-                <el-form-item label="排班名称：" prop="scheduleName">
-                    <el-input v-model="ruleForm.scheduleName" placeholder=""></el-input>
+                <el-form-item label="始发校区：">
+                    <el-input v-model="ruleForm.startLocation" placeholder=""></el-input>
                 </el-form-item>
+                <el-form-item label="终点校区：">
+                    <el-input v-model="ruleForm.endLocation" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="路线ID：">
+                    <el-input v-model="ruleForm.routeId" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="发车时间：">
+                    <el-input v-model="ruleForm.startTime" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="发车星期：">
+                    <el-input v-model="ruleForm.date" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="车辆ID：">
+                    <el-input v-model="ruleForm.busId" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="座位号：">
+                    <el-input v-model="ruleForm.seatInfo" placeholder="" disabled></el-input>
+                </el-form-item>    
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
@@ -100,13 +172,19 @@ export default {
         const editVisible = ref(false);
         // data 相关数据
         const scheduleData = ref([]);
+        const campusData = ref([]);
+        const routeData = ref([]);
+        const busData = ref([]);
         const pageTotal = ref(0);
         const menu = ref([]);
+        const value = ref();
         // request 相关数据
         const path = "/schedule/querySchedule";
         const query = reactive({
             mode:"id",
-            options:"all",          
+            options:"all",  
+            startLocation:"",
+            endLocation:"",        
             pageIndex:1,
             pageSize:10,
 
@@ -114,12 +192,24 @@ export default {
         // 表单
         const form = reactive({
             scheduleId:"",
-            scheduleName: "",
+            startLocation: "",
+            endLocation: "",
+            routeId: "",
+            startTime: "",
+            date: [],
+            busId: "",
+            seatInfo: [],
         });
         // 规则校验表单
         const ruleForm = reactive({
             scheduleId:"",
-            scheduleName: "",
+            startLocation: "",
+            endLocation: "",
+            routeId: "",
+            startTime: "",
+            date: [],
+            busId: "",
+            seatInfo: [],
         });
         const deleteParam = reactive({
              scheduleId:"",
@@ -127,16 +217,6 @@ export default {
         // 表单规则
         const ruleFormRef = ref()
         // 自定义验证规则
-        const validatePass = (rule, value, callback) => {
-            //  密码只能由大小写英文字母或数字开头，且由大小写英文字母_.组成
-            const reg = /^[A-Za-z0-9][A-Za-z0-9_.]{5,14}$/
-            console.log('reg', value.match(reg))
-            if (!value.match(reg)) {
-                callback(new Error('密码由字母或数字开头，且只能为字母,数字,下划线及（.）'))
-            } else {
-                callback()
-            }
-        }
 
         const addRules = reactive({
             scheduleId: [
@@ -154,19 +234,43 @@ export default {
 
         // 获取表格数据
         const getFormData = () => {
+            if(query.mode != 'id') {
+                query.options = ""
+            }
             getDataParam(query,path).then((res) => {
                 console.log(res)
-                scheduleData.value = res.data
+                scheduleData.value = changeData(res.data);
+                // scheduleData.value = res.data
                 pageTotal.value = res.pageTotal || 10
             });
         };
-        // 获取级联表单的数据
-        const getCascadeData = () => {
-            getDataNoParam("/dept/getCascadeData").then((res) => {
-                console.log(res.data)
-                menu.value = res.data
+        // 获取校园数据
+        const getCampusData = () => {
+            getDataParam(query, "/campus/queryCampus").then((res) => {
+                console.log(res)
+                campusData.value = res.data
+                console.log(campusData.value)
+                pageTotal.value = res.pageTotal || 10
             });
-        }
+        };
+        // 获取校园数据
+        const getRouteData = () => {
+            getDataParam(query, "/route/queryRoute").then((res) => {
+                console.log(res)
+                routeData.value = res.data
+                pageTotal.value = res.pageTotal || 10
+            });
+        };
+        // 获取校园数据
+        const getBusData = () => {
+            getDataParam(query, "/bus/queryBus").then((res) => {
+                console.log(res)
+                busData.value = res.data
+                pageTotal.value = res.pageTotal || 10
+            });
+        };
+
+
         // 添加排班数据
         const addScheduleData = (data) => {
             insertData(data,"/schedule/createSchedule").then((res) => {
@@ -188,6 +292,17 @@ export default {
                 // refresh;
             });
         }
+
+        /**  数据加工方法  */
+        // 更新stop station为数组类型
+        const changeData = (data) => {
+            console.log(data);
+            for (var i = 0; i < data.length; i++) {
+                var day = String(data[i].date);
+                data[i].date = day.split(",");
+            }
+            return data;
+        };
 
         /** 按钮事件  */
 
@@ -254,12 +369,18 @@ export default {
             getFormData();
         };
         // setup时执行的函数
-        getCascadeData();
         getFormData();
+        getCampusData();
+        getRouteData();
+        getBusData();
 
         return {
+            value,
             query,
             scheduleData,
+            campusData,
+            routeData,
+            busData,
             pageTotal,
             editVisible,
             addVisible,

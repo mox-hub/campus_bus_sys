@@ -156,13 +156,7 @@ export default {
                 pageTotal.value = res.pageTotal || 10
             });
         };
-        // 获取级联表单的数据
-        const getCascadeData = () => {
-            getDataNoParam("/dept/getCascadeData").then((res) => {
-                console.log(res.data)
-                menu.value = res.data
-            });
-        }
+
         // 添加用户数据
         const addUserData = (data) => {
             insertData(data,"/user/createUser").then((res) => {
@@ -219,7 +213,6 @@ export default {
         }
 
         // setup时执行的函数
-        getCascadeData();
         getFormData();
 
         return {

@@ -158,13 +158,7 @@ export default {
                 pageTotal.value = res.pageTotal || 10
             });
         };
-        // 获取级联表单的数据
-        const getCascadeData = () => {
-            getDataNoParam("/dept/getCascadeData").then((res) => {
-                console.log(res.data)
-                menu.value = res.data
-            });
-        }
+
         // 添加订单数据
         const addOrderData = (data) => {
             insertData(data,"/order/createOrder").then((res) => {
@@ -252,7 +246,6 @@ export default {
             getFormData();
         };
         // setup时执行的函数
-        getCascadeData();
         getFormData();
 
         return {
