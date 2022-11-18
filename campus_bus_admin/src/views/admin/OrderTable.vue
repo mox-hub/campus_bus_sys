@@ -238,10 +238,10 @@ export default {
         const saveEdit = () => {
             editVisible.value = false;
             Object.keys(form).forEach((item) => {
-                registrationData.value[idx][item] = form[item];
+               orderData.value[idx][item] = form[item];
             });
-            console.log(registrationData.value[idx])
-            updateRegistrationData(registrationData.value[idx]);
+            console.log(orderData.value[idx])
+            updateOrderData(orderData.value[idx]);
             ElMessage.success(`修改第 ${idx + 1} 行成功`);
             getFormData();
         };

@@ -82,14 +82,13 @@
                         <el-option v-for="data in campusData" :key="data.campusId" :label="data.campusName" :value="data.campusName" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="路线ID：">
+                <el-form-item label="路线ID："> 
                     <el-select v-model="form.routeId" placeholder="请选择路线号" class="handle-select mr10">
                         <el-option v-for="route in routeData" :key="route.routeId" :label="route.routeId" :value="route.routeId" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="发车时间：">
-                    <el-time-picker v-model="value" placeholder="请选择发车时间"/>
-                    <el-input v-model="form.startTime" placeholder=""></el-input>
+                    <el-time-select v-model="form.startTime" start="06:00" step="00:10" end="15:30" placeholder="Select time"/>
                 </el-form-item>
                 <el-form-item label="发车星期：">
                     <el-checkbox-group v-model="form.date" border>
@@ -122,31 +121,46 @@
         <!-- 添加弹出框 有校验 -->
         <el-dialog title="添加排班" v-model="addVisible" width="30%">
             <el-form :model="ruleForm" ref="ruleFormRef" :rules="addRules" label-width="100px">
-            <!-- <el-form rules="rules" label-width="70px"> -->
-                <el-form-item label="排班ID：" prop="scheduleId">
+                <el-form-item label="排班ID：">
                     <el-input v-model="ruleForm.scheduleId" placeholder=""></el-input>
                 </el-form-item>
                 <el-form-item label="始发校区：">
-                    <el-input v-model="ruleForm.startLocation" placeholder=""></el-input>
+                    <el-select v-model="ruleForm.startLocation" placeholder="始发校区" class="handle-select mr10">
+                        <el-option v-for="data in campusData" :key="data.campusId" :label="data.campusName" :value="data.campusName" />
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="终点校区：">
-                    <el-input v-model="ruleForm.endLocation" placeholder=""></el-input>
+                    <el-select v-model="ruleForm.endLocation" placeholder="终点校区" class="handle-select mr10">
+                        <el-option v-for="data in campusData" :key="data.campusId" :label="data.campusName" :value="data.campusName" />
+                    </el-select>
                 </el-form-item>
-                <el-form-item label="路线ID：">
-                    <el-input v-model="ruleForm.routeId" placeholder=""></el-input>
+                <el-form-item label="路线ID："> 
+                    <el-select v-model="ruleForm.routeId" placeholder="请选择路线号" class="handle-select mr10">
+                        <el-option v-for="route in routeData" :key="route.routeId" :label="route.routeId" :value="route.routeId" />
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="发车时间：">
-                    <el-input v-model="ruleForm.startTime" placeholder=""></el-input>
+                    <el-time-select v-model="ruleForm.startTime" start="06:00" step="00:10" end="15:30" placeholder="Select time"/>
                 </el-form-item>
                 <el-form-item label="发车星期：">
-                    <el-input v-model="ruleForm.date" placeholder=""></el-input>
+                    <el-checkbox-group v-model="ruleForm.date" border>
+                        <el-checkbox label="1" />
+                        <el-checkbox label="2" />
+                        <el-checkbox label="3" />
+                        <el-checkbox label="4" />
+                        <el-checkbox label="5" />
+                        <el-checkbox label="6" />
+                        <el-checkbox label="7" />
+                    </el-checkbox-group>
                 </el-form-item>
                 <el-form-item label="车辆ID：">
-                    <el-input v-model="ruleForm.busId" placeholder=""></el-input>
+                    <el-select v-model="ruleForm.busId" placeholder="终点校区" class="handle-select mr10">
+                        <el-option v-for="bus in busData" :key="bus.busId" :label="bus.busName" :value="bus.busId" />
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="座位号：">
                     <el-input v-model="ruleForm.seatInfo" placeholder="" disabled></el-input>
-                </el-form-item>    
+                </el-form-item>              
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
@@ -162,7 +176,7 @@
 
 import { ref, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { getDataNoParam, getDataParam, insertData, deleteData, updateData } from "../../api/index";
+import { getDataParam, insertData, deleteData, updateData } from "../../api/index";
 
 export default {
     name: "scheduleTable",
@@ -352,6 +366,8 @@ export default {
         const saveCreate = () => {
             addVisible.value = false;
             console.log(ruleForm)
+            ruleForm.date = ruleForm.date.join(",")
+            ruleForm.seatInfo = ruleForm.seatInfo.join(",")
             addScheduleData(ruleForm);
             ElMessage.success(`添加新用户成功`);
             getFormData();
@@ -361,10 +377,10 @@ export default {
         const saveEdit = () => {
             editVisible.value = false;
             Object.keys(form).forEach((item) => {
-                registrationData.value[idx][item] = form[item];
+                scheduleData.value[idx][item] = form[item];
             });
-            console.log(registrationData.value[idx])
-            updateRegistrationData(registrationData.value[idx]);
+            console.log(scheduleData.value[idx])
+            updateScheduleData(scheduleData.value[idx]);
             ElMessage.success(`修改第 ${idx + 1} 行成功`);
             getFormData();
         };
