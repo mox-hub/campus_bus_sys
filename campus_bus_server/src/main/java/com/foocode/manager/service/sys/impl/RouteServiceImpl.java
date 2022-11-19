@@ -54,10 +54,10 @@ public class RouteServiceImpl implements RouteService {
                 logger.info("[{}]:: 查询所有{}信息 >>> 查询成功", projectName, text);
                 return new Response<>(routes, pageTotal);
             } else if ("id".equals(mode)) {
-                List<Route> routes = new ArrayList<>();
                 Route route = routeMapper.selectById(options);
+                List<Route> routes = new ArrayList<>();
                 routes.add(route);
-                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功 {}", projectName, text, mode, route);
+                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功 {}", projectName, text, mode, routes);
                 return new Response<>(routes);
             } else {
                 Response<Object> response = new Response<>(-2, "查询模式错误！");

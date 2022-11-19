@@ -14,19 +14,19 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName(value = "sys_order")
 public class Order {
 
-    @TableId(type = IdType.INPUT)
-    private String orderId;
+    @TableId(type = IdType.ASSIGN_ID)
+    private Long orderId;
     private String userId;
     private String scheduleId;
     private String seatInfo;
     private String orderTime;
     private String orderStatus;
 
-    public String getOrderId() {
+    public Long getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(String orderId) {
+    public void setOrderId(Long orderId) {
         this.orderId = orderId;
     }
 

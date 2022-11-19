@@ -63,6 +63,14 @@ public class ScheduleServiceImpl implements ScheduleService {
                 schedules.add(schedule);
                 logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功 [{}]", projectName, text, mode, schedules);
                 return new Response<>(schedules);
+            } else if ("date".equals(mode)) {
+                QueryWrapper<Schedule> wrapper = new QueryWrapper<>();
+                wrapper.like("date", options);
+                scheduleMapper.selectPage(page, wrapper);
+                List<Schedule> schedules = page.getRecords();
+                int pageTotal = (int) page.getTotal();
+                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功[{}]", projectName, text, mode, schedules);
+                return new Response<>(schedules, pageTotal);
             } else if ("location".equals(mode)) {
                 if (startLocation != null && endLocation != null) {
                     QueryWrapper<Schedule> wrapper = new QueryWrapper<>();

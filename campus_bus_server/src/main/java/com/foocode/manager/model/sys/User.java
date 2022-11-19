@@ -15,19 +15,19 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName(value = "sys_user")
 public class User {
 
-    @TableId(type = IdType.INPUT)
-    private String userId;
+    @TableId(type = IdType.AUTO)
+    private Integer userId;
     private String userName;
     private String avatar;
     private String phone;
-    private String workId;
-    private String campusId;
+    private Integer workId;
+    private Integer campusId;
 
-    public String getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
@@ -55,19 +55,19 @@ public class User {
         this.phone = phone;
     }
 
-    public String getWorkId() {
+    public Integer getWorkId() {
         return workId;
     }
 
-    public void setWorkId(String workId) {
+    public void setWorkId(Integer workId) {
         this.workId = workId;
     }
 
-    public String getCampusId() {
+    public Integer getCampusId() {
         return campusId;
     }
 
-    public void setCampusId(String campusId) {
+    public void setCampusId(Integer campusId) {
         this.campusId = campusId;
     }
 

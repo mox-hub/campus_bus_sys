@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -55,8 +56,10 @@ public class OrderServiceImpl implements OrderService {
                 return new Response<>(orders, pageTotal);
             } else if ("id".equals(mode)) {
                 Order order = orderMapper.selectById(options);
-                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功 {}", projectName, text, mode, order);
-                return new Response<>(order);
+                List<Order> orders = new ArrayList<>();
+                orders.add(order);
+                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功 {}", projectName, text, mode, orders);
+                return new Response<>(orders);
             } else if ("user".equals(mode)) {
                 QueryWrapper<Order> wrapper = new QueryWrapper<>();
                 wrapper.eq("user_id", options);

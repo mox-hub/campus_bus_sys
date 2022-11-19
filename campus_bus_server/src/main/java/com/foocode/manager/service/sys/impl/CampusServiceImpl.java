@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -62,10 +63,10 @@ public class CampusServiceImpl implements CampusService {
                 return new Response<>(campuses, pageTotal);
             } else if ("id".equals(mode)) {
                 Campus campus = campusMapper.selectById(options);
-//                List<Campus> campuses = new ArrayList<>();
-//                campuses.add(campus);
-                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功 {}", projectName, text, mode, campus);
-                return new Response<>(campus);
+                List<Campus> campuses = new ArrayList<>();
+                campuses.add(campus);
+                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功 {}", projectName, text, mode, campuses);
+                return new Response<>(campuses);
             } else if ("name".equals(mode)) {
                 QueryWrapper<Campus> wrapper = new QueryWrapper<>();
                 wrapper.like("campus_name", options);

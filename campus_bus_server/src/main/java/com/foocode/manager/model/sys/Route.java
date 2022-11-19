@@ -14,17 +14,17 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName(value = "sys_route")
 public class Route {
-    @TableId(type = IdType.INPUT)
-    private String routeId;
+    @TableId(type = IdType.AUTO)
+    private Integer routeId;
     private String startStation;
     private String endStation;
     private String stopStation;
 
-    public String getRouteId() {
+    public Integer getRouteId() {
         return routeId;
     }
 
-    public void setRouteId(String routeId) {
+    public void setRouteId(Integer routeId) {
         this.routeId = routeId;
     }
 

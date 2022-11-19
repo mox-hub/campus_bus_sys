@@ -13,21 +13,21 @@ import com.baomidou.mybatisplus.annotation.TableName;
  **/
 @TableName(value = "sys_schedule")
 public class Schedule {
-    @TableId(type = IdType.INPUT)
-    private String scheduleId;
+    @TableId(type = IdType.AUTO)
+    private Integer scheduleId;
     private String startLocation;
     private String endLocation;
-    private String routeId;
+    private Integer routeId;
     private String startTime;
     private String date;
-    private String busId;
+    private Integer busId;
     private String seatInfo;
 
-    public String getScheduleId() {
+    public Integer getScheduleId() {
         return scheduleId;
     }
 
-    public void setScheduleId(String scheduleId) {
+    public void setScheduleId(Integer scheduleId) {
         this.scheduleId = scheduleId;
     }
 
@@ -47,11 +47,11 @@ public class Schedule {
         this.endLocation = endLocation;
     }
 
-    public String getRouteId() {
+    public Integer getRouteId() {
         return routeId;
     }
 
-    public void setRouteId(String routeId) {
+    public void setRouteId(Integer routeId) {
         this.routeId = routeId;
     }
 
@@ -71,11 +71,11 @@ public class Schedule {
         this.date = date;
     }
 
-    public String getBusId() {
+    public Integer getBusId() {
         return busId;
     }
 
-    public void setBusId(String busId) {
+    public void setBusId(Integer busId) {
         this.busId = busId;
     }
 

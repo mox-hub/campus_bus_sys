@@ -13,15 +13,15 @@ import com.baomidou.mybatisplus.annotation.TableName;
  **/
 @TableName(value = "sys_campus")
 public class Campus {
-    @TableId(type = IdType.INPUT)
-    private String campusId;
+    @TableId(type = IdType.AUTO)
+    private Integer campusId;
     private String campusName;
 
-    public String getCampusId() {
+    public Integer getCampusId() {
         return campusId;
     }
 
-    public void setCampusId(String campusId) {
+    public void setCampusId(Integer campusId) {
         this.campusId = campusId;
     }
 

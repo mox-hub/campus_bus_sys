@@ -13,17 +13,19 @@ import com.baomidou.mybatisplus.annotation.TableName;
  **/
 @TableName(value = "sys_bus")
 public class Bus {
-    @TableId(type = IdType.INPUT)
-    private String busId;
+    @TableId(type = IdType.AUTO)
+    private Integer busId;
     private String busName;
+    private Integer busRows;
+    private Integer busColumns;
     private String busImage;
-    private String busType;
 
-    public String getBusId() {
+
+    public Integer getBusId() {
         return busId;
     }
 
-    public void setBusId(String busId) {
+    public void setBusId(Integer busId) {
         this.busId = busId;
     }
 
@@ -35,6 +37,22 @@ public class Bus {
         this.busName = busName;
     }
 
+    public Integer getBusRows() {
+        return busRows;
+    }
+
+    public void setBusRows(Integer busRows) {
+        this.busRows = busRows;
+    }
+
+    public Integer getBusColumns() {
+        return busColumns;
+    }
+
+    public void setBusColumns(Integer busColumns) {
+        this.busColumns = busColumns;
+    }
+
     public String getBusImage() {
         return busImage;
     }
@@ -43,21 +61,14 @@ public class Bus {
         this.busImage = busImage;
     }
 
-    public String getBusType() {
-        return busType;
-    }
-
-    public void setBusType(String busType) {
-        this.busType = busType;
-    }
-
     @Override
     public String toString() {
         return "Bus{" +
                 "busId='" + busId + '\'' +
                 ", busName='" + busName + '\'' +
+                ", busRows='" + busRows + '\'' +
+                ", busColumns='" + busColumns + '\'' +
                 ", busImage='" + busImage + '\'' +
-                ", busType='" + busType + '\'' +
                 '}';
     }
 }

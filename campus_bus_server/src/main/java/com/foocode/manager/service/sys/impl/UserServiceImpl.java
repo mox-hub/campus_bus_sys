@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -43,22 +44,24 @@ public class UserServiceImpl implements UserService {
         try {
             if ("all".equals(options)) {
                 userMapper.selectPage(page, null);
-                List<User> Users = page.getRecords();
+                List<User> users = page.getRecords();
                 int pageTotal = (int) page.getTotal();
                 logger.info("[{}]getUserInfo:: 查询所有{}信息 >>> 查询成功", projectName, text);
-                return new Response<>(Users, pageTotal);
+                return new Response<>(users, pageTotal);
             } else if ("id".equals(mode)) {
-                User User = userMapper.selectById(options);
-                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功 {}", projectName, text, mode, User);
-                return new Response<>(User);
+                User user = userMapper.selectById(options);
+                List<User> users = new ArrayList<>();
+                users.add(user);
+                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功 {}", projectName, text, mode, users);
+                return new Response<>(users);
             } else if ("name".equals(mode)) {
                 QueryWrapper<User> wrapper = new QueryWrapper<>();
                 wrapper.eq("user_name", options);
                 userMapper.selectPage(page, wrapper);
-                List<User> Users = page.getRecords();
+                List<User> users = page.getRecords();
                 int pageTotal = (int) page.getTotal();
                 logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功", projectName, mode, text);
-                return new Response<>(Users, pageTotal);
+                return new Response<>(users, pageTotal);
             } else {
                 Response<Object> response = new Response<>(-2, "查询模式错误！");
                 logger.error("[{}]:: 查询所有{}信息 >>> 查询失败 [{}]", projectName, text, response);
