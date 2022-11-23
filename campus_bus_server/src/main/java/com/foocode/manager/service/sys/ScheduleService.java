@@ -8,7 +8,11 @@ public interface ScheduleService {
 
     Object getScheduleList();
 
+    Object getScheduleListAssociated();
+
     Object querySchedule(Map<String, String> data);
+
+    Object queryScheduleAssociated(Map<String, String> data);
 
     Object createSchedule(Schedule schedule);
 

@@ -20,9 +20,21 @@ public class ScheduleController {
         return res;
     }
 
+    @GetMapping(value = "/schedule/getScheduleListAssociated")
+    public Object getScheduleListAssociated() {
+        Object res = scheduleService.getScheduleListAssociated();
+        return res;
+    }
+
     @GetMapping(value = "/schedule/querySchedule")
     public Object querySchedule(@RequestParam Map<String, String> data) {
         Object res = scheduleService.querySchedule(data);
+        return res;
+    }
+
+    @GetMapping(value = "/schedule/queryScheduleAssociated")
+    public Object queryScheduleAssociated(@RequestParam Map<String, String> data) {
+        Object res = scheduleService.queryScheduleAssociated(data);
         return res;
     }
 

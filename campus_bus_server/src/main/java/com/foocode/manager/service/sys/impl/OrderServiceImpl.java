@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.foocode.manager.mapper.sys.OrderMapper;
 import com.foocode.manager.model.Response;
 import com.foocode.manager.model.sys.Order;
+import com.foocode.manager.model.sys.OrderVo;
+import com.foocode.manager.model.sys.ScheduleVo;
 import com.foocode.manager.service.sys.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +44,20 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Object getOrderListAssociated() {
+        try {
+            List<OrderVo> orderVoList = orderMapper.getListAssociated();
+            logger.info("[{}]:: 查询所有{}信息 >>> 查询成功 {}", projectName, text, orderVoList);
+            return new Response<>(orderVoList);
+        } catch (NullPointerException e) {
+            Response<Object> response = new Response<>(-1, "未查询到{}！", text);
+            logger.error("[{}]::查询所有{}信息 >>> 查询失败！{}", projectName, text, response);
+            return response;
+        }
+    }
+
+
+    @Override
     public Object queryOrder(Map<String, String> data) {
         String mode = data.get("mode");
         String options = data.get("options");
@@ -68,6 +84,49 @@ public class OrderServiceImpl implements OrderService {
                 int pageTotal = (int) page.getTotal();
                 logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功", projectName, mode, text);
                 return new Response<>(orders, pageTotal);
+            } else {
+                Response<Object> response = new Response<>(-2, "查询模式错误！");
+                logger.error("[{}]:: 查询所有{}信息 >>> 查询失败 [{}]", projectName, text, response);
+                return response;
+            }
+        } catch (NullPointerException e) {
+            Response<Object> response = new Response<>(-1, "查询失败！");
+            logger.error("[{}]::查询{}信息 >>> 查询失败！[{}]", projectName, text, e);
+            return response;
+        }
+    }
+
+    @Override
+    public Object queryOrderAssociated(Map<String, String> data) {
+        String mode = data.get("mode");
+        String options = data.get("options");
+        logger.info("[{}]:: 查询{}信息:: 查询模式-> " + mode + " 查询参数->" + options, projectName, text);
+        IPage<OrderVo> page = new Page<>(Integer.parseInt(data.get("pageIndex")), Integer.parseInt(data.get("pageSize")));
+        try {
+            if ("all".equals(options)) {
+                QueryWrapper<OrderVo> wrapper = new QueryWrapper<>();
+                wrapper.isNotNull("order_id").orderByAsc("order_id");
+                orderMapper.queryAssociated(page, wrapper);
+                List<OrderVo> orderVoList = page.getRecords();
+                int pageTotal = (int) page.getTotal();
+                logger.info("[{}]:: 查询所有{}信息 >>> 查询成功", projectName, text);
+                return new Response<>(orderVoList, pageTotal);
+            } else if ("id".equals(mode)) {
+                QueryWrapper<OrderVo> wrapper = new QueryWrapper<>();
+                wrapper.eq("order_id", options);
+                orderMapper.queryAssociated(page, wrapper);
+                List<OrderVo> orderVoList = page.getRecords();
+                int pageTotal = (int) page.getTotal();
+                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功 {}", projectName, text, mode, orderVoList);
+                return new Response<>(orderVoList, pageTotal);
+            } else if ("user".equals(mode)) {
+                QueryWrapper<OrderVo> wrapper = new QueryWrapper<>();
+                wrapper.eq("o.user_id", options);
+                orderMapper.queryAssociated(page, wrapper);
+                List<OrderVo> orderVoList = page.getRecords();
+                int pageTotal = (int) page.getTotal();
+                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功", projectName, mode, text);
+                return new Response<>(orderVoList, pageTotal);
             } else {
                 Response<Object> response = new Response<>(-2, "查询模式错误！");
                 logger.error("[{}]:: 查询所有{}信息 >>> 查询失败 [{}]", projectName, text, response);

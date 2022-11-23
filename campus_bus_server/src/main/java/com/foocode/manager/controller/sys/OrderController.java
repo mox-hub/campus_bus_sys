@@ -19,9 +19,21 @@ public class OrderController {
         return res;
     }
 
+    @GetMapping(value = "/order/getOrderListAssociated")
+    public Object getOrderListAssociated() {
+        Object res = orderService.getOrderListAssociated();
+        return res;
+    }
+
     @GetMapping(value = "/order/queryOrder")
     public Object queryOrder(@RequestParam Map<String, String> data) {
         Object res = orderService.queryOrder(data);
+        return res;
+    }
+
+    @GetMapping(value = "/order/queryOrderAssociated")
+    public Object queryOrderAssociated(@RequestParam Map<String, String> data) {
+        Object res = orderService.queryOrderAssociated(data);
         return res;
     }
 

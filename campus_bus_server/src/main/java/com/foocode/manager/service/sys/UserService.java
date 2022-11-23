@@ -5,5 +5,11 @@ import java.util.Map;
 
 public interface UserService {
 
-    Object getUserInfo(Map<String, String> data);
+    Object getUserList();
+
+    Object getUserListAssociated();
+
+    Object queryUser(Map<String, String> data);
+
+    Object queryUserAssociated(Map<String, String> data);
 }

@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.foocode.manager.mapper.sys.ScheduleMapper;
 import com.foocode.manager.model.Response;
 import com.foocode.manager.model.sys.Schedule;
+
+import com.foocode.manager.model.sys.ScheduleVo;
 import com.foocode.manager.service.sys.ScheduleService;
 
 import org.apache.commons.lang.StringUtils;
@@ -35,6 +37,19 @@ public class ScheduleServiceImpl implements ScheduleService {
             List<Schedule> schedules = scheduleMapper.selectList(null);
             logger.info("[{}]:: 查询所有{}信息 >>> 查询成功 {}", projectName, text, schedules);
             return new Response<>(schedules);
+        } catch (NullPointerException e) {
+            Response<Object> response = new Response<>(-1, "未查询到{}！", text);
+            logger.error("[{}]::查询所有{}信息 >>> 查询失败！{}", projectName, text, response);
+            return response;
+        }
+    }
+
+    @Override
+    public Object getScheduleListAssociated() {
+        try {
+            List<ScheduleVo> scheduleVoList = scheduleMapper.getListAssociated();
+            logger.info("[{}]:: 查询所有{}信息 >>> 查询成功 {}", projectName, text, scheduleVoList);
+            return new Response<>(scheduleVoList);
         } catch (NullPointerException e) {
             Response<Object> response = new Response<>(-1, "未查询到{}！", text);
             logger.error("[{}]::查询所有{}信息 >>> 查询失败！{}", projectName, text, response);
@@ -109,6 +124,94 @@ public class ScheduleServiceImpl implements ScheduleService {
                     int pageTotal = (int) page.getTotal();
                     logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功[{}]", projectName, text, mode, schedules);
                     return new Response<>(schedules, pageTotal);
+                } else {
+                    Response<Object> response = new Response<>(-3, "查询信息不完整！");
+                    logger.error("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询失败 [{}]", projectName, text, mode, response);
+                    return response;
+                }
+            } else {
+                Response<Object> response = new Response<>(-2, "查询模式错误！");
+                logger.error("[{}]:: 查询所有{}信息 >>> 查询失败 [{}]", projectName, text, response);
+                return response;
+            }
+        } catch (NullPointerException e) {
+            Response<Object> response = new Response<>(-1, "查询失败！");
+            logger.error("[{}]::查询{}信息 >>> 查询失败！[{}]", projectName, text, e);
+            return response;
+        }
+    }
+
+    @Override
+    public Object queryScheduleAssociated(Map<String, String> data) {
+        String mode = data.get("mode");
+        String options = data.get("options");
+        String startLocation = data.get("startLocation");
+        String endLocation = data.get("endLocation");
+        logger.info("[{}]:: 查询{}信息:: 查询模式-> " + mode + " 查询参数->" + options, projectName, text);
+        IPage<ScheduleVo> page = new Page<>(Integer.parseInt(data.get("pageIndex")), Integer.parseInt(data.get("pageSize")));
+        try {
+            if ("all".equals(options)) {
+                QueryWrapper<ScheduleVo> wrapper = new QueryWrapper<>();
+                wrapper.isNotNull("schedule_id").orderByAsc("schedule_id");
+                scheduleMapper.queryAssociated(page, wrapper);
+                List<ScheduleVo> scheduleVoList = page.getRecords();
+                int pageTotal = (int) page.getTotal();
+                logger.info("[{}]:: 查询所有{}信息 >>> 查询成功[{}]", projectName, text, scheduleVoList);
+                return new Response<>(scheduleVoList, pageTotal);
+            } else if ("id".equals(mode)) {
+                QueryWrapper<ScheduleVo> wrapper = new QueryWrapper<>();
+                wrapper.eq("schedule_id", options);
+                scheduleMapper.queryAssociated(page, wrapper);
+                List<ScheduleVo> scheduleVoList = page.getRecords();
+                int pageTotal = (int) page.getTotal();
+                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功 [{}]", projectName, text, mode, scheduleVoList);
+                return new Response<>(scheduleVoList, pageTotal);
+            } else if ("date".equals(mode)) {
+                QueryWrapper<ScheduleVo> wrapper = new QueryWrapper<>();
+                wrapper.like("date", options);
+                scheduleMapper.queryAssociated(page, wrapper);
+                List<ScheduleVo> scheduleVoList = page.getRecords();
+                int pageTotal = (int) page.getTotal();
+                logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功[{}]", projectName, text, mode, scheduleVoList);
+                return new Response<>(scheduleVoList, pageTotal);
+            } else if ("location".equals(mode)) {
+                if (startLocation != null && endLocation != null) {
+                    QueryWrapper<ScheduleVo> wrapper = new QueryWrapper<>();
+                    wrapper.like("start_location", startLocation)
+                            .like("end_location", endLocation);
+                    scheduleMapper.queryAssociated(page, wrapper);
+                    List<ScheduleVo> scheduleVoList = page.getRecords();
+                    int pageTotal = (int) page.getTotal();
+                    logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功[{}]", projectName, text, mode, scheduleVoList);
+                    return new Response<>(scheduleVoList, pageTotal);
+                } else {
+                    Response<Object> response = new Response<>(-3, "查询信息不完整！");
+                    logger.error("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询失败 [{}]", projectName, text, mode, response);
+                    return response;
+                }
+            } else if ("startLocation".equals(mode)) {
+                if (startLocation != null) {
+                    QueryWrapper<ScheduleVo> wrapper = new QueryWrapper<>();
+                    wrapper.like("start_location", startLocation);
+                    scheduleMapper.queryAssociated(page, wrapper);
+                    List<ScheduleVo> scheduleVoList = page.getRecords();
+                    int pageTotal = (int) page.getTotal();
+                    logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功[{}]", projectName, text, mode, scheduleVoList);
+                    return new Response<>(scheduleVoList, pageTotal);
+                } else {
+                    Response<Object> response = new Response<>(-3, "查询信息不完整！");
+                    logger.error("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询失败 [{}]", projectName, text, mode, response);
+                    return response;
+                }
+            } else if ("endLocation".equals(mode)) {
+                if (endLocation != null) {
+                    QueryWrapper<ScheduleVo> wrapper = new QueryWrapper<>();
+                    wrapper.like("end_location", endLocation);
+                    scheduleMapper.queryAssociated(page, wrapper);
+                    List<ScheduleVo> scheduleVoList = page.getRecords();
+                    int pageTotal = (int) page.getTotal();
+                    logger.info("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询成功[{}]", projectName, text, mode, scheduleVoList);
+                    return new Response<>(scheduleVoList, pageTotal);
                 } else {
                     Response<Object> response = new Response<>(-3, "查询信息不完整！");
                     logger.error("[{}]:: 查询{}信息:: 查询模式-> {} >>> 查询失败 [{}]", projectName, text, mode, response);

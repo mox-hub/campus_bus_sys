@@ -16,8 +16,8 @@ public class Order {
 
     @TableId(type = IdType.ASSIGN_ID)
     private Long orderId;
-    private String userId;
-    private String scheduleId;
+    private Integer userId;
+    private Integer scheduleId;
     private String seatInfo;
     private String orderTime;
     private String orderStatus;
@@ -30,19 +30,19 @@ public class Order {
         this.orderId = orderId;
     }
 
-    public String getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    public String getScheduleId() {
+    public Integer getScheduleId() {
         return scheduleId;
     }
 
-    public void setScheduleId(String scheduleId) {
+    public void setScheduleId(Integer scheduleId) {
         this.scheduleId = scheduleId;
     }
 
