@@ -2,8 +2,8 @@
 	<!-- 页面 -->
 	<view class="content">	
 		<!-- 导航栏 -->
-<!-- 		<tui-navigation-bar splitLine title="NavBar自定义导航栏" backgroundColor="#fff" color="#333">
-		</tui-navigation-bar> -->
+		<tui-navigation-bar splitLine title="NavBar自定义导航栏" backgroundColor="#fff" color="#333">
+		</tui-navigation-bar>
 		
 	
 		<!-- 路径选择 -->
@@ -22,11 +22,11 @@
 				<template v-slot:dropdownbox>
 					<view class="tui-selected-list">
 						<scroll-view scroll-y class="tui-dropdown-scroll">
-							<block v-for="(item,index) in startStationData" :key="index">
-								<tui-list-cell padding="0" @click="pickStartStation(index)" :unlined="startStationData.length-1==index">
+							<block v-for="(item,index) in campusDataRes" :key="index">
+								<tui-list-cell padding="0" @click="pickStartStation(index)" :unlined="campusDataRes.length-1==index">
 									<view class="tui-cell-class">
-										<tui-icon class="icon" :name="item.icon" :size="item.size" :color="item.color"></tui-icon>
-										<text class="tui-ml-20">{{item.name}}</text>
+										<tui-icon class="icon" name="position" size="22" color="#55aaff"></tui-icon>
+										<text class="tui-ml-20">{{item.campusName}}</text>
 									</view>
 								</tui-list-cell>
 							</block>
@@ -50,11 +50,11 @@
 				<template v-slot:dropdownbox>
 					<view class="tui-selected-list">
 						<scroll-view scroll-y class="tui-dropdown-scroll">
-							<block v-for="(item,index) in endStationData" :key="index">
-								<tui-list-cell padding="0" @click="pickEndStation(index)" :unlined="endStationData.length-1==index">
+							<block v-for="(item,index) in campusDataRes" :key="index">
+								<tui-list-cell padding="0" @click="pickEndStation(index)" :unlined="campusDataRes.length-1==index">
 									<view class="tui-cell-class">
-										<tui-icon class="icon" :name="item.icon" :size="item.size" :color="item.color"></tui-icon>
-										<text class="tui-ml-20">{{item.name}}</text>
+										<tui-icon class="icon" name="position" size="22" color="#55aaff"></tui-icon>
+										<text class="tui-ml-20">{{item.campusName}}</text>
 									</view>
 								</tui-list-cell>
 							</block>
@@ -74,7 +74,7 @@
 		
 		<!-- 车票列表 -->
 		<tui-list-view class="list" title="今日车票" color="#777">		
-			<tui-list-cell class="list-cell" v-for="(item,index) in scheduleData" :key="index">
+			<tui-list-cell class="list-cell" v-for="(item,index) in scheduleDataRes" :key="index">
 				<view class="card">
 					<!-- 标签栏 -->
 					<view class="card-flex">
@@ -84,8 +84,8 @@
 					<view class="card-flex card-station">
 						<!-- 始发站 -->
 						<view class="title-outline">					
-							<text class="card-title">{{item.start}}</text>
-							<text class="card-sub-title">{{item.startStation}}</text>
+							<text class="card-title">{{item.startLocation}}</text>
+							<text class="card-sub-title sub-title-size">{{item.startStation}}</text>
 						</view>
 						<!-- 经停站显示 -->
 						 <tui-dropdown-list  class="start-station" :show="item.stopStationShow" :top="94" :height="400">
@@ -102,10 +102,17 @@
 							<template v-slot:dropdownbox>
 								<view class="tui-selected-list">
 									<scroll-view scroll-y class="tui-dropdown-scroll">
-										<block v-for="(item1,index) in item.stopStation" :key="index">
-											<tui-list-cell padding="0" :unlined="item.stopStation.length-1==index">
+										<block v-if="item.stopStation == ''">
+											<tui-list-cell padding="0" :unlined="item.stopStation.length-1 == index">
 												<view class="tui-cell-class">
-													<text class="tui-ml-20">{{item1.name}}</text>
+													<text class="tui-ml-20">暂无经停站</text>
+												</view>
+											</tui-list-cell>
+										</block>
+										<block v-else v-for="index in item.stopStation" :key="index">
+											<tui-list-cell padding="0" :unlined="item.stopStation.length-1 == index">
+												<view class="tui-cell-class">
+													<text class="tui-ml-20">{{index}}</text>
 												</view>
 											</tui-list-cell>
 										</block>
@@ -115,8 +122,8 @@
 						 </tui-dropdown-list>
 						 <!-- 终点站 -->
 						 <view class="title-outline">
-							 <text class="card-title">{{item.end}}</text>
-							 <text class="card-sub-title">{{item.endStation}}</text>							 
+							 <text class="card-title">{{item.endLocation}}</text>
+							 <text class="card-sub-title sub-title-size">{{item.endStation}}</text>							 
 						 </view>
 					</view>
 					<!-- 分割线 -->
@@ -140,232 +147,227 @@
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				// 全局变量
-				changeFlag:false,
-				startStation: "始发校区",
-				endStation: "终点校区",
-				current: 0,
-				currentDay: 0,
-				tabs: [{
-						name: "一"
-					}, {
-						name: "二"
-					}, {
-						name: "三"
-					}, {
-						name: "四",
-					},{
-						name: "五",
-					},{
-						name: "六",
-					},{
-						name: "日",
-					},
-				],
-								
-				startStationShow: false,
-				endStationShow: false,
-				
-				startStationData: [{
-					name: "翡翠湖校区",
-					icon: "position",
-					color: "#80D640",
-					size: 22
+	
+import { reactive, ref } from "vue"
+import { getDataNoParam, getDataParam, insertData, deleteData, updateData } from "../../api/api.js";
+
+export default {
+	data() {
+		return {
+			// 全局变量
+			changeFlag:false,
+			startStation: "始发校区",
+			endStation: "终点校区",
+			current: 0,
+			currentDay: 0,
+			pageTotal: 0,
+			query: {
+				mode:"id",
+				options: "all",
+				startLocation:"",
+				endLocation:"",        
+				pageIndex:1,
+				pageSize:10,
+			},
+			scheduleDataRes: [],
+			campusDataRes: [],
+			tabs: [{
+					name: "一",
+					value:1,
 				}, {
-					name: "屯溪路校区",
-					icon: "position",
-					color: "#00AAEE",
-					size: 22
-				}],
-				
-				endStationData: [{
-					name: "六安路校区",
-					icon: "position",
-					color: "#80D640",
-					size: 22
+					name: "二",
+					value:2,
 				}, {
-					name: "宣城校区",
-					icon: "position",
-					color: "#00AAEE",
-					size: 22
+					name: "三",
+					value:3,
 				}, {
-					name: "翡翠湖校区",
-					icon: "position",
-					color: "#ff7900",
-					size: 22
-				}],
-				scheduleData:[
-					{
-						stopStationShow:false,
-						startTime:"8:30",
-						start:"屯溪路校区",
-						end:"翡翠湖校区",
-						startStation:"屯溪路校区北大门",
-						endStation:"翡翠湖校区5教",
-						stopStation:[
-							{
-								name: "长丰路",
-							},
-							{
-								name: "仪表厂",
-							}
-						],
-						busId:"1",
-						ticket:10
-					},
-					{
-						stopStationShow:false,
-						startTime:"9:30",
-						start:"屯溪路校区",
-						end:"翡翠湖校区",
-						startStation:"屯溪路校区北大门",
-						endStation:"翡翠湖校区5教",
-						stopStation:[
-							{
-								name: "暂无经停站",
-							},
-						],
-						busId:"2",
-						ticket:12
-					},
-				],
-				
-				stopStationData:[
-					{
-						name: "长丰路",
-					},
-					{
-						name: "仪表厂",
-				}],
-				
-				card: {
-					img: {
-						url: '/static/logo.png'
-					},
-					title: {
-						text: 'CSDN云计算'
-					},
-					tag: {
-						text: '1小时前'
-					},
-					header: {
-						bgcolor: '#F7F7F7',
-						line: true
-					},
+					name: "四",
+					value:4,
+				},{
+					name: "五",
+					value:5,
+				},{
+					name: "六",
+					value:6,
+				},{
+					name: "日",
+					value:7,
 				},
-				navigate: [{
-					url: "/pages/index/index",
-					type: "switchTab",
-					text: "返回首页",
-					color: "#5677fc"
-				}, {
-					url: "/pages/my/my",
-					type: "switchTab",
-					text: "个人中心",
-					color: "#5677fc",
-					size: 30
-				}],
-				
-				// 路由tabbar
-				tabBar: [
-					{
-						pagePath: '/pages/index/index',
-						text: '首页',
-						iconPath: '/static/images/tabbar/home_gray.png',
-						selectedIconPath: '/static/images/tabbar/home_active.png'
-					},
-					{
-						pagePath: '/pages/ticket/ticket',
-						text: '车票',
-						iconPath: '/static/images/tabbar/ticket.png',
-						hump: true,
-						selectedIconPath: '/static/images/tabbar/ticket.png'
-					},
-					{
-						pagePath: '/pages/my/my',
-						text: '我的',
-						iconPath: '/static/images/tabbar/me_gray.png',
-						selectedIconPath: '/static/images/tabbar/me_active.png',
-						num: 2,
-						isDot: true,
-						verify: true
-					}
-				],
-				
+			],
+							
+			startStationShow: false,
+			endStationShow: false,
+			
+			card: {
+				img: {
+					url: '/static/logo.png'
+				},
+				title: {
+					text: 'CSDN云计算'
+				},
+				tag: {
+					text: '1小时前'
+				},
+				header: {
+					bgcolor: '#F7F7F7',
+					line: true
+				},
+			},
+			navigate: [{
+				url: "/pages/index/index",
+				type: "switchTab",
+				text: "返回首页",
+				color: "#5677fc"
+			}, {
+				url: "/pages/my/my",
+				type: "switchTab",
+				text: "个人中心",
+				color: "#5677fc",
+				size: 30
+			}],
+			
+			// 路由tabbar
+			tabBar: [
+				{
+					pagePath: '/pages/index/index',
+					text: '首页',
+					iconPath: '/static/images/tabbar/home_gray.png',
+					selectedIconPath: '/static/images/tabbar/home_active.png'
+				},
+				{
+					pagePath: '/pages/ticket/ticket',
+					text: '车票',
+					iconPath: '/static/images/tabbar/ticket.png',
+					hump: true,
+					selectedIconPath: '/static/images/tabbar/ticket.png'
+				},
+				{
+					pagePath: '/pages/my/my',
+					text: '我的',
+					iconPath: '/static/images/tabbar/me_gray.png',
+					selectedIconPath: '/static/images/tabbar/me_active.png',
+					num: 2,
+					isDot: true,
+					verify: true
+				}
+			],
+			
+		}
+	},
+	
+	methods: {
+		
+		// 获取排班信息
+		getScheduleData(){
+			if(this.query.mode != 'id') {
+				this.query.options = ""
 			}
-		},
-		onLoad() {
+			getDataParam(this.query,'/schedule/queryScheduleAssociated').then((res) => {
+				console.log(res)
+				this.scheduleDataRes = this.changeData(res.data)
+				console.log(this.scheduleDataRes)
+				this.pageTotal = res.pageTotal || 10
+			})
 		},
 		
-		methods: {
+		// 获取校园信息
+		getCampusData(){
+			if(this.query.mode != 'id') {
+				this.query.options = "all"
+			}
+			getDataParam(this.query,'/campus/queryCampus').then((res) => {
+				console.log(res)
+				this.campusDataRes = res.data
+				console.log(this.campusDataRes)
+			})
+		},
+		
+		/**  数据加工方法  */
+		// 更新stop station为数组类型
+		changeData(data){
+			for (var i = 0; i < data.length; i++) {
+				var day = data[i].date;
+				var stop = data[i].stopStation;
+				data[i].date = day.split(",");
+				data[i].stopStation = stop.split(",");
+				data[i].stopStationShow = false;
+			}
+			return data;
+		},
+		
+		// 按钮事件
+		
+		// 交换始发站终点站
+		exchangeStation() {
+			var tmp = this.startStation
+			this.startStation = this.endStation
+			this.endStation = tmp
+			this.changeFlag = true
+		},
+		
+		// 始发站下拉菜单
+		dropDownStartList(index) {
+			if (index !== -1) {
+				this.tui.toast("index：" + index)
+			}
+			this.startStationShow = !this.startStationShow
+		},
+		
+		// 终点站下拉菜单
+		dropDownEndList(index) {
+			if (index !== -1) {
+				this.tui.toast("index：" + index)
+			}
+			this.endStationShow = !this.endStationShow
+		},
+		
+		// 经停站下拉菜单
+		dropDownStopList(index) {
+			this.scheduleDataRes[index].stopStationShow = !this.scheduleDataRes[index].stopStationShow
+		},
+		
+		// 选择 始发站
+		pickStartStation(index) {
+			this.startStation = this.campusDataRes[index].campusName
+			this.query.startLocation = this.startStation
+			this.startStationShow = !this.startStationShow
+			this.changeFlag = true
+		},
+		pickEndStation(index) {
+			this.endStation = this.campusDataRes[index].campusName
+			this.query.endLocation = this.endStation
+			this.endStationShow = !this.endStationShow
+			this.changeFlag = true
+		},
+		
+		chooseDay(e) {
+			this.currentDay = e.index
+		},
+		
+		dropDownList(index) {
+			if (index !== -1) {
+				this.tui.toast("index：" + index)
+			}
+			this.dropdownShow = !this.dropdownShow
+		},
+		
+		tabbarSwitch(e){
+			console.log(e)
+			uni.switchTab({
+				url:e.pagePath
+			})
+		},
+		change (){
 			
-			// 按钮事件
-			
-			// 交换始发站终点站
-			exchangeStation() {
-				var tmp = this.startStation
-				this.startStation = this.endStation
-				this.endStation = tmp
-				this.changeFlag = true
-			},
-			
-			// 始发站下拉菜单
-			dropDownStartList(index) {
-				if (index !== -1) {
-					this.tui.toast("index：" + index)
-				}
-				this.startStationShow = !this.startStationShow
-			},
-			
-			// 终点站下拉菜单
-			dropDownEndList(index) {
-				if (index !== -1) {
-					this.tui.toast("index：" + index)
-				}
-				this.endStationShow = !this.endStationShow
-			},
-			
-			dropDownStopList(index) {
-				this.scheduleData[index].stopStationShow = !this.scheduleData[index].stopStationShow
-			},
-			
-			// 选择 始发站
-			pickStartStation(index) {
-				this.startStation = this.startStationData[index].name
-				this.startStationShow = !this.startStationShow
-				this.changeFlag = true
-			},
-			pickEndStation(index) {
-				this.endStation = this.endStationData[index].name
-				this.endStationShow = !this.endStationShow
-				this.changeFlag = true
-			},
-			
-			chooseDay(e) {
-				this.currentDay = e.index
-			},
-			
-			dropDownList(index) {
-				if (index !== -1) {
-					this.tui.toast("index：" + index)
-				}
-				this.dropdownShow = !this.dropdownShow
-			},
-			
-			tabbarSwitch(e){
-				console.log(e)
-				uni.switchTab({
-					url:e.pagePath
-				})
-			},
-			change (){
-				
-			},
-		}
-	}
+		},
+	},
+	
+	onLoad:function(options) {
+		console.log(this.query);
+		this.getScheduleData();
+		this.getCampusData();
+	},
+}
 </script>
 
 <style>
@@ -417,9 +419,17 @@
 		font-size: 36rpx;
 		color: #8f8f94;
 	}
+	.sub-title-size {
+		width: 200rpx;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
 	
 	/*下拉选择*/
-
+	.text-item {
+		text-align: center;
+	}
 	.tui-animation {
 		display: inline-block;
 		transform: rotate(0deg);
@@ -459,7 +469,7 @@
 		display: flex;
 	}
 	.card-station {
-		margin-left: 20rpx;
+		margin-left: 30rpx;
 	}
 	.card-info {
 		margin-left: 300rpx;

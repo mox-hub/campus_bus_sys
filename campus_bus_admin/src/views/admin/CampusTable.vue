@@ -204,7 +204,7 @@ export default {
             addVisible.value = false;
             console.log(ruleForm)
             addCampusData(ruleForm);
-            ElMessage.success(`添加新用户成功`);
+            ElMessage.success(`添加校区成功`);
             getFormData();
         }
 
