@@ -91,6 +91,9 @@ public class ScheduleServiceImpl implements ScheduleService {
                     QueryWrapper<Schedule> wrapper = new QueryWrapper<>();
                     wrapper.like("start_location", startLocation)
                             .like("end_location", endLocation);
+                    if(!("".equals(options))){
+                        wrapper.like("date", options);
+                    }
                     scheduleMapper.selectPage(page, wrapper);
                     List<Schedule> schedules = page.getRecords();
                     int pageTotal = (int) page.getTotal();
@@ -105,6 +108,9 @@ public class ScheduleServiceImpl implements ScheduleService {
                 if (startLocation != null) {
                     QueryWrapper<Schedule> wrapper = new QueryWrapper<>();
                     wrapper.like("start_location", startLocation);
+                    if(!("".equals(options))){
+                        wrapper.like("date", options);
+                    }
                     scheduleMapper.selectPage(page, wrapper);
                     List<Schedule> schedules = page.getRecords();
                     int pageTotal = (int) page.getTotal();
@@ -119,6 +125,9 @@ public class ScheduleServiceImpl implements ScheduleService {
                 if (endLocation != null) {
                     QueryWrapper<Schedule> wrapper = new QueryWrapper<>();
                     wrapper.like("end_location", endLocation);
+                    if(!("".equals(options))){
+                        wrapper.like("date", options);
+                    }
                     scheduleMapper.selectPage(page, wrapper);
                     List<Schedule> schedules = page.getRecords();
                     int pageTotal = (int) page.getTotal();
@@ -179,6 +188,9 @@ public class ScheduleServiceImpl implements ScheduleService {
                     QueryWrapper<ScheduleVo> wrapper = new QueryWrapper<>();
                     wrapper.like("start_location", startLocation)
                             .like("end_location", endLocation);
+                    if(!("".equals(options))){
+                        wrapper.like("date", options);
+                    }
                     scheduleMapper.queryAssociated(page, wrapper);
                     List<ScheduleVo> scheduleVoList = page.getRecords();
                     int pageTotal = (int) page.getTotal();
@@ -193,6 +205,9 @@ public class ScheduleServiceImpl implements ScheduleService {
                 if (startLocation != null) {
                     QueryWrapper<ScheduleVo> wrapper = new QueryWrapper<>();
                     wrapper.like("start_location", startLocation);
+                    if(!("".equals(options))){
+                        wrapper.like("date", options);
+                    }
                     scheduleMapper.queryAssociated(page, wrapper);
                     List<ScheduleVo> scheduleVoList = page.getRecords();
                     int pageTotal = (int) page.getTotal();
@@ -207,6 +222,9 @@ public class ScheduleServiceImpl implements ScheduleService {
                 if (endLocation != null) {
                     QueryWrapper<ScheduleVo> wrapper = new QueryWrapper<>();
                     wrapper.like("end_location", endLocation);
+                    if(!("".equals(options))){
+                        wrapper.like("date", options);
+                    }
                     scheduleMapper.queryAssociated(page, wrapper);
                     List<ScheduleVo> scheduleVoList = page.getRecords();
                     int pageTotal = (int) page.getTotal();
