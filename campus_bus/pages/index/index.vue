@@ -66,16 +66,17 @@
 		
 		<!-- 查询按钮 -->
 		<view class="update-button" v-if="changeFlag">
-			<tui-button shape="circle" height="80rpx" width="80%">查询</tui-button>
+			<tui-button shape="circle" height="80rpx" width="80%" @click="querySchedule">查询</tui-button>
 		</view>
 		
 		<!-- 星期选择框 -->
 		<tui-tabs color="#999" :tabs="tabs" selectedColor="#5677fc" :currentTab="currentDay" @change="chooseDay"></tui-tabs>
 		
 		<!-- 车票列表 -->
-		<tui-list-view class="list" title="今日车票" color="#777">		
+		<tui-list-view v-if="listShow" class="list" title="今日车票" color="#777">		
+			<tui-no-data imgUrl="/static/images/nodata.png">暂无数据</tui-no-data>
 			<tui-list-cell class="list-cell" v-for="(item,index) in scheduleDataRes" :key="index">
-				<view class="card">
+				<view class="card" @click="pickTicket(item.scheduleId)">
 					<!-- 标签栏 -->
 					<view class="card-flex">
 						<tui-tag class="card-time-tag" type="light-blue" shape="circle">{{item.startTime}}发出</tui-tag>
@@ -138,17 +139,13 @@
 			</tui-list-cell>
 		</tui-list-view>
 		
-		<!-- footer -->
-		<tui-footer copyright="Copyright © 2014-2019 Thor UI." :navigate="navigate"></tui-footer>
-		
 		<!-- tabbar -->
 		<tui-tabbar :isFixed="true" :tabBar="tabBar" hump :current="current" @click="tabbarSwitch"></tui-tabbar>
 	</view>
 </template>
 
 <script>
-	
-import { reactive, ref } from "vue"
+
 import { getDataNoParam, getDataParam, insertData, deleteData, updateData } from "../../api/api.js";
 
 export default {
@@ -161,16 +158,23 @@ export default {
 			current: 0,
 			currentDay: 0,
 			pageTotal: 0,
-			query: {
+			campusQuery: {
 				mode:"id",
-				options: "all",
+				options:"all",    
+				pageIndex:1,
+				pageSize:100,
+			},
+			query: {
+				mode:"date",
+				options:"1",
 				startLocation:"",
 				endLocation:"",        
 				pageIndex:1,
-				pageSize:10,
+				pageSize:100,
 			},
 			scheduleDataRes: [],
 			campusDataRes: [],
+			
 			tabs: [{
 					name: "一",
 					value:1,
@@ -197,7 +201,7 @@ export default {
 							
 			startStationShow: false,
 			endStationShow: false,
-			
+			listShow: true,
 			card: {
 				img: {
 					url: '/static/logo.png'
@@ -213,18 +217,6 @@ export default {
 					line: true
 				},
 			},
-			navigate: [{
-				url: "/pages/index/index",
-				type: "switchTab",
-				text: "返回首页",
-				color: "#5677fc"
-			}, {
-				url: "/pages/my/my",
-				type: "switchTab",
-				text: "个人中心",
-				color: "#5677fc",
-				size: 30
-			}],
 			
 			// 路由tabbar
 			tabBar: [
@@ -259,9 +251,6 @@ export default {
 		
 		// 获取排班信息
 		getScheduleData(){
-			if(this.query.mode != 'id') {
-				this.query.options = ""
-			}
 			getDataParam(this.query,'/schedule/queryScheduleAssociated').then((res) => {
 				console.log(res)
 				this.scheduleDataRes = this.changeData(res.data)
@@ -269,13 +258,19 @@ export default {
 				this.pageTotal = res.pageTotal || 10
 			})
 		},
+		addScheduleData(){
+			getDataParam(this.query,'/schedule/queryScheduleAssociated').then((res) => {
+				console.log(res)
+				this.scheduleDataRes.push(this.changeData(res.data))
+				console.log(this.scheduleDataRes)
+				this.pageTotal = res.pageTotal || 10
+			})
+			// this.$forceUpdate()
+		},
 		
 		// 获取校园信息
 		getCampusData(){
-			if(this.query.mode != 'id') {
-				this.query.options = "all"
-			}
-			getDataParam(this.query,'/campus/queryCampus').then((res) => {
+			getDataParam(this.campusQuery,'/campus/queryCampus').then((res) => {
 				console.log(res)
 				this.campusDataRes = res.data
 				console.log(this.campusDataRes)
@@ -286,16 +281,35 @@ export default {
 		// 更新stop station为数组类型
 		changeData(data){
 			for (var i = 0; i < data.length; i++) {
-				var day = data[i].date;
-				var stop = data[i].stopStation;
-				data[i].date = day.split(",");
-				data[i].stopStation = stop.split(",");
-				data[i].stopStationShow = false;
+				var day = data[i].date
+				var stop = data[i].stopStation
+				data[i].date = day.split(",")
+				data[i].stopStation = stop.split(",")
+				data[i].stopStationShow = false
 			}
 			return data;
 		},
 		
 		// 按钮事件
+		
+		// 查询按钮
+		querySchedule() {
+			this.listShow = false
+			if(this.startStation == '初始校区' && this.endStation != '终点校区') {
+				this.query.mode = 'endLocation'
+			} 
+			else if(this.startStation != '初始校区' && this.endStation == '终点校区') {
+				this.query.mode = 'startLocation'
+			} 
+			else {
+				this.query.mode = 'location'
+			}
+			this.getScheduleData()
+			this.$nextTick(() => {
+				this.listShow = true;
+			})
+			this.changeFlag = false
+		},
 		
 		// 交换始发站终点站
 		exchangeStation() {
@@ -333,6 +347,7 @@ export default {
 			this.startStationShow = !this.startStationShow
 			this.changeFlag = true
 		},
+		
 		pickEndStation(index) {
 			this.endStation = this.campusDataRes[index].campusName
 			this.query.endLocation = this.endStation
@@ -341,14 +356,19 @@ export default {
 		},
 		
 		chooseDay(e) {
+			this.listShow = false
+			this.query.options = JSON.stringify(e.index + 1) 
+			console.log(this.query.options)
 			this.currentDay = e.index
+			this.getScheduleData()
+			this.$nextTick(() => {
+				this.listShow = true
+			})
 		},
-		
-		dropDownList(index) {
-			if (index !== -1) {
-				this.tui.toast("index：" + index)
-			}
-			this.dropdownShow = !this.dropdownShow
+		pickTicket(id) {
+			uni.navigateTo({
+				url:'/pages/ticket/pick_ticket?id='+id,
+			})
 		},
 		
 		tabbarSwitch(e){
@@ -357,16 +377,31 @@ export default {
 				url:e.pagePath
 			})
 		},
+		
+
 		change (){
 			
 		},
 	},
 	
 	onLoad:function(options) {
-		console.log(this.query);
-		this.getScheduleData();
 		this.getCampusData();
+		this.getScheduleData();
 	},
+	
+	onReachBottom() {
+		console.log("到达底部")
+		if(this.query.pageIndex * this.query.pageSize < this.pageTotal) {
+			this.query.pageIndex ++
+			console.log(this.query.pageIndex)
+			this.addScheduleData()
+		} else {
+			uni.showToast({
+				title: '暂无更多数据'
+			})
+
+		}
+	}
 }
 </script>
 
@@ -499,6 +534,10 @@ export default {
 	}
 	.card-icon {
 		margin: 10rpx;
+	}
+	
+	.blank-bar {
+		height: 100rpx;
 	}
 	
 </style>

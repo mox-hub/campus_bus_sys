@@ -1,404 +1,319 @@
 <template>
-<view id="select-seat">
-    <view class="top">
-      <span class="icon-back" @click="$router.go(-1)"></span>
-      <span class="name ellipsis">{{cinemaInfo.cinema_name}}</span>
-    </view>
-    <view class="movie-info">
-      <view class="name">{{movieInfo.name}}</view>
-      <view class="intro"><span class="date">{{scheduleInfo.show_date|dateFilter}}</span><span class="time">{{scheduleInfo.show_time}}</span><span class="language">{{movieInfo.language}}3D</span></view>
-    </view>
-    <view class="seat-block">
-      <view class="screen">{{scheduleInfo.hall_name}}银幕</view>
-      <view class="center">银幕中央</view>
-      <view class="screen-line"></view>
-      <view class="row-container">
-        <span>1</span>
-        <span>2</span>
-        <span>3</span>
-        <span>4</span>
-        <span>5</span>
-        <span>6</span>
-      </view>
-      <view class="seat-container">
-        <view class="row" v-if="hackReset" v-for="(itemI,indexI) in seatIJ" :key="indexI">
-          <span class="seat"
-            v-for="(itemJ,indexJ) in itemI"
-            :key="indexJ"
-            :class="{'icon-sold-seat':itemJ===1,'icon-empty-seat':itemJ===0,'icon-selected-seat':itemJ===2}"
-            @click.prevent="handleSelectSeat(indexI,indexJ)"
-          ></span>
-        </view>
-      </view>
-      <view class="seat-example">
-        <view class="example empty-example"><span class="icon icon-empty-seat"></span>可选</view>
-        <view class="example sold-example"><span class="icon icon-sold-seat"></span>不可选</view>
-        <view class="example selected-example"><span class="icon icon-selected-seat"></span>已选</view>
-      </view>
-    </view>
-    <view class="bottom">
-      <view class="title" v-if="selectedSeat">已选座位</view>
-      <view class="selected-seat" v-if="selectedSeat">
-        <view class="seat-item" v-for="(item,index) in selectedSeatInfo" :key="index">
-          <view class="left">
-            <span class="seat">{{item[0]+1}}排{{item[1]+1}}座</span>
-            <span class="price">{{(scheduleInfo.price).toFixed(2)}}元</span>
-          </view>
-          <span class="right icon-close" @click="cancelSelectedSeat(item[0],item[1])"></span>
-        </view>
-      </view>
-      <span class="btn" v-if="!selectedSeat">请先选座</span>
-      <span class="btn active" v-else @click="ensureSeatBtn">确认选座</span>
-    </view>
-  </view>
+	<!-- 页面 -->
+	<view class="content">
+	<view class="card" v-for="item in scheduleDataRes">
+		<!-- 站点显示 -->
+		<view class="card-flex card-station">
+			<!-- 始发站 -->
+			<view class="title-outline">					
+				<text class="card-title">{{item.startLocation}}</text>
+				<text class="card-sub-title sub-title-size">{{item.startStation}}</text>
+			</view>
+			<!-- 经停站显示 -->
+			<text class="card-title">发往</text>
+			 
+			 <!-- 终点站 -->
+			 <view class="title-outline">
+				 <text class="card-title">{{item.endLocation}}</text>
+				 <text class="card-sub-title sub-title-size">{{item.endStation}}</text>							 
+			 </view>
+		</view>
+		<!-- 分割线 -->
+		<tui-divider width="90%" v-bind:height="20" gradual></tui-divider>
+		<!-- 其他信息 -->
+		<view class="card-flex card-info">
+			<!-- 时间信息 -->
+			<tui-tag class="card-time-tag" type="light-blue" shape="square">2023年11月24日 {{item.startTime}}发出</tui-tag>
+			<!-- 车辆ID -->
+			<tui-tag class="card-bus-tag" type="light-blue" shape="square" plain>车辆：{{item.busName}}</tui-tag>
+		</view>
+	</view>
+		<!-- 提示信息 -->
+		<view class="ticket-info">
+			<img class="ticket-info-seat" src="@/static/images/seat/seat_blank.png"/>
+			<text class="ticket-info-font">可选</text>
+			<img class="ticket-info-seat" src="@/static/images/seat/seat_select.png"/>
+			<text class="ticket-info-font">已选</text>
+			<img class="ticket-info-seat" src="@/static/images/seat/seat_selected.png"/>
+			<text class="ticket-info-font">不可选</text>
+		</view>
+		<!-- 选座面板 -->
+		<view class="seat-panel" v-for="bus in scheduleDataRes">
+			<!-- 左列排号 -->
+			<view class="column-container">
+				<view v-for="(col,index) in bus.busColumns" :key="index" class="info-font">{{col}}</view>
+			</view>
+			<!-- 右侧 -->
+			<view class="right-container">
+				<!-- 车辆前方 -->
+				<view class="bus-info">
+					<text class="bus-info-font">车辆前方</text>
+				</view>
+				<!-- 车辆内部 -->
+				<view v-if="seatShow" class="seat-container">
+					<view v-for="(itemI,indexI) in seatIJ" :key="indexI" class="seat-row">
+						<view v-for="(itemJ,indexJ) in itemI" :key="indexJ" class="seat-column">
+							<view v-if="indexJ == 2" class="blank"></view>						
+								<img v-on:click="selectSeat(indexI,indexJ)" v-if="itemJ == 0" class="seat-img" src="@/static/images/seat/seat_blank.png"/>
+								<img v-on:click="deleteSeat(indexI,indexJ)" v-else-if="itemJ == 1" class="seat-img" src="@/static/images/seat/seat_select.png"/>
+								<img v-else-if="itemJ == 2" class="seat-img" src="@/static/images/seat/seat_selected.png"/>
+						</view>
+					</view>
+				</view>
+				<!-- 车辆后方 -->
+				<view class="bus-info">
+					<text class="bus-info-font">车辆前方</text>
+				</view>
+			</view>
+		</view>
+		<view class="blank-bar"/>
+		<tui-footer copyright="Copyright © 2022-至今 Foocode." :fixed="false"></tui-footer>
+		<view class="blank-bar"/>
+		<view class="button-bar">
+			<view v-if="selected" class="select-panel">
+				<view class="select-panel-title">
+					<text>{{column}}排{{row}}座位</text>
+				</view>
+			</view>
+			<tui-button v-bind:disabled="!selected">购票</tui-button>
+		</view>
+	</view>
 </template>
 
 <script>
-	    export default {
-	        name: "SelectSeat",
-	        data(){
-	          return{
-	            cinemaInfo:{},
-	            movieInfo:{},
-	            scheduleInfo:{},
-	            seatInfo:'',
-	            seatCount:0,
-	            selectedSeat:false,
-	            hackReset:true,
-	            selectedSeatInfo:[],
-	            seatIJ:[
-	              [0,0,0,0,0,0,0,0,0,0],
-	              [0,0,0,0,0,0,0,0,0,0],
-	              [0,0,0,0,0,0,0,0,0,0],
-	              [0,0,0,0,0,0,0,0,0,0],
-	              [0,0,0,0,0,0,0,0,0,0],
-	              [0,0,0,0,0,0,0,0,0,0]
-	            ],
-	          }
-	        },
-	        created() {
-	          Indicator.open('Loading...');
-	          this.loadInfo();
-	        },
-	        methods:{
-	          //加载信息
-	          async loadInfo(){
-	            // if (this.$route.query.cinema_id&&this.$route.query.movie_id&&this.$route.query.schedule_id){
-	            //   let json = await getCurrentCinemaDetail(this.$route.query.cinema_id);
-	            //   if (json.success_code===200) {
-	            //     this.cinemaInfo = json.data;
-	            //   }
-	            //   json = await getMovieDetail(this.$route.query.movie_id);
-	            //   if (json.success_code===200) {
-	            //     this.movieInfo = json.data[0];
-	            //   }
-	            //   json = await getScheduleById(this.$route.query.schedule_id);
-	            //   if (json.success_code===200) {
-	            //     this.scheduleInfo = json.data;
-	            //     this.seatInfo = this.scheduleInfo.seat_info;
-	            //     if (this.seatInfo){
-	            //       this.seatInfo = JSON.parse(this.seatInfo);
-	            //       this.seatInfo.forEach((value)=>{
-	            //         if (value%10!==0){
-	            //           this.seatIJ[parseInt(value/10)][value%10-1] = 1;
-	            //         } else{
-	            //           this.seatIJ[parseInt(value/10)-1][9] = 1;
-	            //         }
-	            //       });
-	            //     }
-	            //   }
-	            // }
-	            // Indicator.close();
-	          },
-	          //选择座位
-	          handleSelectSeat(indexI,indexJ){
-	            // if (this.seatCount===4&&this.seatIJ[indexI][indexJ]===0){
-	            //   MessageBox.alert('一次最多选择4个座位哦！');
-	            // } else{
-	            //   if (this.seatIJ[indexI][indexJ]===0){
-	            //     this.seatIJ[indexI][indexJ]=2;
-	            //     this.selectedSeatInfo.push([indexI,indexJ]);
-	            //     this.seatCount+=1;
-	            //     if (!this.selectedSeat){
-	            //       this.selectedSeat = true;
-	            //     }
-	            //   }
-	            //   else if (this.seatIJ[indexI][indexJ]===2){
-	            //     this.seatIJ[indexI][indexJ]=0;
-	            //     this.seatCount-=1;
-	            //     let currentIndex;
-	            //     this.selectedSeatInfo.forEach((value,index)=>{
-	            //       if (indexI===value[0]&&indexJ===value[1]){
-	            //         currentIndex = index;
-	            //       }
-	            //     });
-	            //     this.selectedSeatInfo.splice(currentIndex,1);
-	            //     if (this.seatCount===0){
-	            //       this.selectedSeat = false;
-	            //     }
-	            //   }
-	            //   this.hackReset = false;
-	            //   this.$nextTick(() => {
-	            //     this.hackReset = true;
-	            //   });
-	            // }
-	          },
-	          //取消选座
-	          cancelSelectedSeat(indexI,indexJ){
-	            // this.seatIJ[indexI][indexJ]=0;
-	            // this.seatCount-=1;
-	            // let currentIndex;
-	            // this.selectedSeatInfo.forEach((value,index)=>{
-	            //   if (indexI===value[0]&&indexJ===value[1]){
-	            //     currentIndex = index;
-	            //   }
-	            // });
-	            // this.selectedSeatInfo.splice(currentIndex,1);
-	            // if (this.seatCount===0){
-	            //   this.selectedSeat = false;
-	            // }
-	          },
-	          //确认选座
-	          async ensureSeatBtn(){
-	            // if (this.$cookies.get('user_id')){
-	            //   if (!this.seatInfo) {
-	            //     this.seatInfo = [];
-	            //   }
-	            //   this.selectedSeatInfo.forEach((value,index)=>{
-	            //     this.seatInfo.push(value[0]*10+value[1]+1);
-	            //     this.$cookies.set('seat_'+(index+1),value[0]*10+value[1]+1);
-	            //   });
-	            //   this.$cookies.set('seat_count',this.selectedSeatInfo.length);
-	            //   this.seatInfo = JSON.stringify(this.seatInfo);
-	            //   let json = await updateScheduleSeat(this.$route.query.schedule_id,this.seatInfo);
-	            //   if (json.success_code===200){
-	            //     Toast({
-	            //       message: '锁定座位成功',
-	            //       position: 'middle',
-	            //       duration: 2000
-	            //     });
-	            //     this.$router.push({path:'/submit_order',query:{cinema_id:this.$route.query.cinema_id,movie_id:this.$route.query.movie_id,schedule_id:this.$route.query.schedule_id,}});
-	            //   }
-	            // } else{
-	            //   this.$router.push('./login');
-	            // }
-	          // }
-	        },
-	        filters:{
-	          dateFilter(props){
-	            props = props+'';
-	            return props.split('-')[0]+'年'+props.split('-')[1]+'月'+props.split('-')[2]+'日';
-	          }
-	        }
-	    },
+	import { getDataNoParam, getDataParam, insertData, deleteData, updateData } from "../../api/api.js";
+	export default {
+		data(){
+			return{
+				id:1,
+				current: 1,
+				column: 1,
+				row: 1,
+				flag: 0,
+				selected: false,
+				query: {
+					mode:"id",
+					options:"1",   
+					pageIndex:1,
+					pageSize:10,
+				},
+				scheduleDataRes: [],
+				seatShow: true,
+				seatIJ: [
+					[0,0,2,0],
+					[0,0,2,0],
+					[0,0,0,0],
+					[0,0,2,2],
+					[0,0,2,2],
+					[0,0,0,0],
+					[0,0,0,0],
+					[0,0,0,0],
+					[0,0,0,0],
+				],
+			}
+		},
+		methods: {
+			// 获取排班信息
+			getScheduleData(){
+				getDataParam(this.query,'/schedule/queryScheduleAssociated').then((res) => {
+					console.log(res)
+					this.scheduleDataRes = res.data
+					console.log(this.scheduleDataRes)
+					this.pageTotal = res.pageTotal || 10
+				})
+			},
+			
+			// 切换tabbar
+			tabbarSwitch(e){
+				console.log(e)
+				uni.switchTab({
+					url:e.pagePath
+				})
+			},
+			selectSeat(i,j) {
+				if(this.flag < 1) {
+					this.seatIJ[i][j] = 1;
+					this.column = i + 1;
+					this.row = j + 1;
+					this.flag ++;
+					this.selected = true;
+				} else {
+					uni.showToast({
+						title: '您只能选一张票',
+						icon:'none',
+						duration: 2000
+					})
+				}
+			},
+			deleteSeat(i,j) {
+				this.flag --;
+				this.selected = false;
+				this.seatIJ[i][j] = 0;
+			},
+		},
+		onLoad(e) {
+			this.id = e.id
+			this.getScheduleData();
+		},
 	}
 </script>
 
 <style>
-#select-seat {
-  width: 100%;
-  height: 100%;
-  color: #000;
-  font-size: 0.3125rem;
-}
-#select-seat .top {
-  width: 100%;
-  height: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background-color: #dd2727;
-  color: #fff;
-}
-#select-seat .top .icon-back {
-  font-size: 0.4rem;
-  position: absolute;
-  left: 0.3rem;
-}
-#select-seat .top .name {
-  width: 60%;
-  text-align: center;
-  font-size: 0.375rem;
-}
-#select-seat .movie-info {
-  margin-top: 1rem;
-  display: flex;
-  flex-flow: column;
-  padding: 0.25rem;
-}
-#select-seat .movie-info .name {
-  margin-bottom: 0.25rem;
-  font-size: 0.345rem;
-  font-weight: 700;
-}
-#select-seat .movie-info .intro {
-  font-size: 0.28rem;
-  margin-bottom: 0.25rem;
-  color: #888;
-}
-#select-seat .movie-info .intro span {
-  margin-right: 0.12rem;
-}
-#select-seat .seat-block {
-  width: 100%;
-  background: #f1f1f1;
-  position: absolute;
-  left: 0;
-  top: 2.5rem;
-  bottom: 0;
-}
-#select-seat .seat-block .screen {
-  width: 4rem;
-  margin: 0 auto;
-  text-align: center;
-  background: #dcdcdc;
-  font-size: 0.25rem;
-  padding: 0.08rem 0;
-  border-bottom-left-radius: 0.4rem;
-  border-bottom-right-radius: 0.4rem;
-  position: relative;
-  left: 0.28rem;
-}
-#select-seat .seat-block .center {
-  font-size: 0.2rem;
-  width: 1rem;
-  position: absolute;
-  text-align: center;
-  padding: 0.08rem 0.1rem;
-  top: 1.2rem;
-  left: 50%;
-  margin-left: -0.3125rem;
-  letter-spacing: 0.02rem;
-  background-color: #fff;
-  color: #888;
-  border-radius: 0.12rem;
-}
-#select-seat .seat-block .screen-line {
-  width: 0;
-  height: 4.8rem;
-  border: 0.02rem dashed #dcdcdc;
-  position: absolute;
-  top: 1.6rem;
-  left: 50%;
-  margin-left: 0.28rem;
-}
-#select-seat .seat-block .row-container {
-  position: absolute;
-  top: 1.4rem;
-  left: 0.25rem;
-  width: 0.4rem;
-  height: 4rem;
-  padding: 0.6rem 0;
-  background-color: rgba(168,168,168,0.8);
-  display: flex;
-  flex-flow: column;
-  text-align: center;
-  justify-content: space-between;
-  align-items: center;
-  color: #fff;
-  border-radius: 0.2rem;
-  font-size: 0.25rem;
-}
-#select-seat .seat-block .seat-container {
-  padding: 0.12rem 0;
-  position: absolute;
-  top: 1.8rem;
-  left: 0.8rem;
-}
-#select-seat .seat-block .seat-container .row {
-  margin-bottom: 0.25rem;
-}
-#select-seat .seat-block .seat-container .row .seat {
-  font-size: 0.5rem;
-  margin-left: 0.134rem;
-}
-#select-seat .seat-block .seat-example {
-  position: absolute;
-  top: 0.6rem;
-  width: 80%;
-  margin-left: 10%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-#select-seat .seat-block .seat-example .example {
-  font-size: 0.25rem;
-  color: #888;
-  margin-right: 0.25rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-#select-seat .seat-block .seat-example .example .icon {
-  font-size: 0.3rem;
-  margin-right: 0.12rem;
-}
-#select-seat .bottom {
-  position: fixed;
-  width: 100%;
-  left: 0;
-  bottom: 0;
-  background: #fff;
-  z-index: 999;
-  display: flex;
-  flex-flow: column;
-  padding: 0.25rem;
-  padding-top: 0.32rem;
-  box-sizing: border-box;
-}
-#select-seat .bottom .title {
-  font-size: 0.28rem;
-  font-weight: 700;
-  margin-bottom: 0.25rem;
-}
-#select-seat .bottom .btn {
-  height: 0.8rem;
-  line-height: 0.8rem;
-  background-color: #f7dbb3;
-  color: #fff;
-  text-align: center;
-  border-radius: 0.12rem;
-  font-size: 0.28rem;
-}
-#select-seat .bottom .btn.active {
-  background-color: #fe9900;
-}
-#select-seat .bottom .selected-seat {
-  height: 1rem;
-  display: flex;
-}
-#select-seat .bottom .selected-seat .seat-item {
-  width: 25%;
-  height: 0.8rem;
-  display: flex;
-  box-sizing: border-box;
-  justify-content: space-around;
-  align-items: center;
-  border: 0.02rem solid #f1f1f1;
-  margin-right: 0.25rem;
-}
-#select-seat .bottom .selected-seat .seat-item:last-child {
-  margin-right: 0;
-}
-#select-seat .bottom .selected-seat .seat-item .left {
-  display: flex;
-  flex-flow: column;
-  font-size: 0.25rem;
-}
-#select-seat .bottom .selected-seat .seat-item .left .seat {
-  font-size: 0.28rem;
-  color: #666;
-  margin-bottom: 0.12rem;
-}
-#select-seat .bottom .selected-seat .seat-item .left .price {
-  color: #dd2727;
-  font-size: 0.24rem;
-}
-#select-seat .bottom .selected-seat .seat-item .right {
-  font-size: 0.25rem;
-}
-
+	.content {
+		background-color: #f1f1f1;
+		height: 100%;
+		width: 100%;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+	/* 卡片相关 */
+	.card {
+		background-color: #ffffff;
+		height: 200rpx;
+		padding-bottom: 10rpx;
+	}
+	
+	.card-flex {
+		display: flex;
+	}
+	.card-station {
+		margin-left: 40rpx;
+	}
+	.card-info {
+		margin-left: 20px;
+	}
+	.card-time-tag {
+		
+	}
+	.title-outline {
+		display: grid;
+	}
+	.card-title {
+		margin-top: 20rpx;
+		margin-left: 10rpx;
+		margin-right: 10rpx;
+		text-align: center;
+		font-size: 40rpx;
+		font-weight: 600;
+		
+	}
+	.card-sub-title {
+		margin-top: 5rpx;
+		margin-left: 20rpx;
+		margin-right: 10rpx;
+		text-align: center;
+		font-size: 30rpx;
+		font-weight: 500;
+	}
+	.card-icon {
+		margin: 10rpx;
+	}
+	
+	/* 选择座位模块 */
+	
+	.ticket-info {
+		display: flex;
+		margin-top: 20rpx;
+		margin-bottom: 10rpx;
+		margin-left: 150rpx;
+		text-align:center;
+	}
+	.ticket-info-font {
+		margin-left: 5rpx;
+		margin-right: 10rpx;
+		padding: 5rpx;
+		font-size: 28rpx;
+		color: #b6b6b6;
+	}
+	.ticket-info-seat {
+		width: 40rpx;
+		height: 40rpx;
+		padding: 5rpx;
+	}
+	.seat-panel {
+		border-radius: 20rpx;
+		display: flex;
+		width: 100%;
+	}
+	.bus-info {
+		width: 130rpx;
+		background-color: #ffffff;
+		border: 1rpx solid #acacac;
+		border-radius: 20rpx;
+		margin-left: 225rpx;
+	}
+	.bus-info-font {
+		margin: 4rpx;
+		padding: 4rpx;
+		font-weight: 500;
+		font-size: 28rpx;
+		color: #b6b6b6;
+	}
+	.column-container {
+		margin-top: 20rpx;
+		margin-bottom: 20rpx;
+		margin-left: 20rpx;
+		padding-top: 70rpx;
+		padding-bottom: 20rpx;
+		text-align:center;
+		width: 50rpx;
+		border: 5rpx solid #b6b6b6;
+		border-radius: 30rpx;
+		background-color: #b6b6b6;
+	}
+	
+	.info-font {
+		height: 50rpx;
+		padding: 8rpx;
+		text-align:center;
+		font-size: 28rpx;
+		font-weight: 600;
+		color: #2f2f2f;
+	}
+	
+	.seat-container {
+		margin-top: 20rpx;
+		margin-bottom: 20rpx;
+		margin-left: 140rpx;
+		padding: 20rpx;
+		padding-left: 10rpx;
+		border-radius: 20rpx;
+		border: 5rpx solid #b6b6b6;
+	}
+	
+	.seat-row {
+		padding: 8rpx;
+		display: flex;
+	}
+	
+	.seat-column {
+		display: flex;
+		margin-left:10rpx;
+	}
+	.blank {
+		width: 40rpx;
+	}
+	.seat-img {
+		width: 50rpx;
+		height: 50rpx;
+	}
+	.blank-bar {
+		height: 200rpx;
+	}
+	/* 操作面板 */
+	.button-bar {
+		position:fixed;
+		bottom: 0rpx;
+		width: 96%;
+		padding: 10rpx;
+	}
+	.select-panel {
+		background: #fff;
+		height: 200rpx;
+	}
+	
+	.select-panel-title {
+		
+	}
 </style>

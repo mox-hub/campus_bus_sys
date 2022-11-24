@@ -1,8 +1,8 @@
 @font-face {
-  font-family: "iconfont"; /* Project id 3767073 */
-  src: url('//at.alicdn.com/t/c/font_3767073_s59uepjh9dh.woff2?t=1668265739836') format('woff2'),
-       url('//at.alicdn.com/t/c/font_3767073_s59uepjh9dh.woff?t=1668265739836') format('woff'),
-       url('//at.alicdn.com/t/c/font_3767073_s59uepjh9dh.ttf?t=1668265739836') format('truetype');
+  font-family: 'iconfont';  /* Project id 3767073 */
+  src: url('//at.alicdn.com/t/c/font_3767073_4g6mh9xv4qe.woff2?t=1669290963584') format('woff2'),
+       url('//at.alicdn.com/t/c/font_3767073_4g6mh9xv4qe.woff?t=1669290963584') format('woff'),
+       url('//at.alicdn.com/t/c/font_3767073_4g6mh9xv4qe.ttf?t=1669290963584') format('truetype');
 }
 
 .iconfont {
@@ -135,4 +135,16 @@
 
 .icon-exchange:before {
   content: "\eb0d";
+}
+
+.icon-seatselect:before {
+  content: "\eb0e";
+}
+
+.icon-seat:before {
+  content: "\eb0f";
+}
+
+.icon-seatselected:before {
+  content: "\eb10";
 }
