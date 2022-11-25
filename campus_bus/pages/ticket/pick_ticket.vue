@@ -1,33 +1,33 @@
 <template>
 	<!-- 页面 -->
 	<view class="content">
-	<view class="card" v-for="item in scheduleDataRes">
 		<!-- 站点显示 -->
-		<view class="card-flex card-station">
-			<!-- 始发站 -->
-			<view class="title-outline">					
-				<text class="card-title">{{item.startLocation}}</text>
-				<text class="card-sub-title sub-title-size">{{item.startStation}}</text>
+		<view class="card" v-for="item in scheduleDataRes">
+			<view class="card-flex card-station">
+				<!-- 始发站 -->
+				<view class="title-outline">					
+					<text class="card-title">{{item.startLocation}}</text>
+					<text class="card-sub-title sub-title-size">{{item.startStation}}</text>
+				</view>
+				<!-- 经停站显示 -->
+				<text class="card-title">发往</text>
+				 <!-- 终点站 -->
+				 <view class="title-outline">
+					 <text class="card-title">{{item.endLocation}}</text>
+					 <text class="card-sub-title sub-title-size">{{item.endStation}}</text>							 
+				 </view>
 			</view>
-			<!-- 经停站显示 -->
-			<text class="card-title">发往</text>
-			 
-			 <!-- 终点站 -->
-			 <view class="title-outline">
-				 <text class="card-title">{{item.endLocation}}</text>
-				 <text class="card-sub-title sub-title-size">{{item.endStation}}</text>							 
-			 </view>
+			<!-- 分割线 -->
+			<tui-divider width="90%" v-bind:height="20" gradual></tui-divider>
+			<!-- 其他信息 -->
+			<view class="card-flex card-info">
+				<!-- 时间信息 -->
+				<tui-tag class="card-time-tag" type="light-blue" shape="square">2023年11月24日 {{item.startTime}}发出</tui-tag>
+				<!-- 车辆ID -->
+				<tui-tag class="card-bus-tag" type="light-blue" shape="square" plain>车辆：{{item.busName}}</tui-tag>
+			</view>
 		</view>
-		<!-- 分割线 -->
-		<tui-divider width="90%" v-bind:height="20" gradual></tui-divider>
-		<!-- 其他信息 -->
-		<view class="card-flex card-info">
-			<!-- 时间信息 -->
-			<tui-tag class="card-time-tag" type="light-blue" shape="square">2023年11月24日 {{item.startTime}}发出</tui-tag>
-			<!-- 车辆ID -->
-			<tui-tag class="card-bus-tag" type="light-blue" shape="square" plain>车辆：{{item.busName}}</tui-tag>
-		</view>
-	</view>
+
 		<!-- 提示信息 -->
 		<view class="ticket-info">
 			<img class="ticket-info-seat" src="@/static/images/seat/seat_blank.png"/>
@@ -37,6 +37,7 @@
 			<img class="ticket-info-seat" src="@/static/images/seat/seat_selected.png"/>
 			<text class="ticket-info-font">不可选</text>
 		</view>
+		
 		<!-- 选座面板 -->
 		<view class="seat-panel" v-for="bus in scheduleDataRes">
 			<!-- 左列排号 -->
@@ -66,16 +67,19 @@
 				</view>
 			</view>
 		</view>
+		<!-- footer -->
 		<view class="blank-bar"/>
 		<tui-footer copyright="Copyright © 2022-至今 Foocode." :fixed="false"></tui-footer>
 		<view class="blank-bar"/>
+		
+		<!-- 操作面板 -->
 		<view class="button-bar">
 			<view v-if="selected" class="select-panel">
 				<view class="select-panel-title">
 					<text>{{column}}排{{row}}座位</text>
 				</view>
 			</view>
-			<tui-button v-bind:disabled="!selected">购票</tui-button>
+			<tui-button v-bind:disabled="!selected" @click="buyTicket()">购票</tui-button>
 		</view>
 	</view>
 </template>
@@ -85,20 +89,27 @@
 	export default {
 		data(){
 			return{
-				id:1,
-				current: 1,
+				// 全局变量
 				column: 1,
 				row: 1,
-				flag: 0,
-				selected: false,
+				ticketFlag: 0,
+				orderId: "",
 				query: {
 					mode:"id",
 					options:"1",   
 					pageIndex:1,
 					pageSize:10,
 				},
-				scheduleDataRes: [],
+				order: {
+					userId:1,
+					scheduleId:"",
+					seatInfo:"",
+					orderTime: "",
+					orderStatus:"1",
+				},
+				selected: false,
 				seatShow: true,
+				scheduleDataRes: [],
 				seatIJ: [
 					[0,0,2,0],
 					[0,0,2,0],
@@ -113,29 +124,34 @@
 			}
 		},
 		methods: {
+			/* 网络请求 */
+			
 			// 获取排班信息
 			getScheduleData(){
 				getDataParam(this.query,'/schedule/queryScheduleAssociated').then((res) => {
-					console.log(res)
-					this.scheduleDataRes = res.data
-					console.log(this.scheduleDataRes)
-					this.pageTotal = res.pageTotal || 10
+					console.log(res);
+					this.scheduleDataRes = res.data;
+					console.log(this.scheduleDataRes);
+					this.pageTotal = res.pageTotal || 10;
 				})
 			},
 			
-			// 切换tabbar
-			tabbarSwitch(e){
-				console.log(e)
-				uni.switchTab({
-					url:e.pagePath
+			insertOrder(){
+				insertData(this.order,'/order/createOrder').then((res) => {
+					console.log(res);
+					this.orderId = res.data;
 				})
 			},
+			
+			/* button 事件 */
+			
+			// 选择座位
 			selectSeat(i,j) {
-				if(this.flag < 1) {
+				if(this.ticketFlag < 1) {
 					this.seatIJ[i][j] = 1;
 					this.column = i + 1;
 					this.row = j + 1;
-					this.flag ++;
+					this.ticketFlag ++;
 					this.selected = true;
 				} else {
 					uni.showToast({
@@ -145,14 +161,51 @@
 					})
 				}
 			},
+			
+			// 删除座位
 			deleteSeat(i,j) {
-				this.flag --;
+				this.ticketFlag --;
 				this.selected = false;
 				this.seatIJ[i][j] = 0;
 			},
+			
+			// 新建订单
+			buyTicket() {
+				console.log(this.showTime())
+				this.order.orderTime = this.showTime();
+				this.order.seatInfo =  this.fix(this.column,2) + this.fix(this.row,2);
+				this.insertOrder();
+				uni.navigateTo({
+					url: '/pages/ticket/out_ticket?orderId='+this.orderId,
+				})
+			},
+			
+			/* 工具函数 */
+			
+			// 格式化时间
+			showTime() {
+				var now = new Date();
+				now.setMinutes(now.getMinutes() + 10)
+				var year = now.getFullYear(),
+				month = now.getMonth() + 1,
+				date = now.getDate(),
+				h = this.fix(now.getHours(),2),
+				m = this.fix(now.getMinutes(),2),
+				s = this.fix(now.getSeconds(),2);
+				
+				return year +"-" + month + "-" + date + " " + h + ":" + m + ":" + s;
+			},
+			
+			// 格式化数字
+			fix(num, length) {
+			  return ('' + num).length < length ? ((new Array(length + 1)).join('0') + num).slice(-length) : '' + num;
+			}
 		},
+		
+		// 加载
 		onLoad(e) {
-			this.id = e.id
+			this.query.options = e.id
+			this.order.scheduleId = e.id
 			this.getScheduleData();
 		},
 	}
@@ -301,6 +354,7 @@
 	.blank-bar {
 		height: 200rpx;
 	}
+	
 	/* 操作面板 */
 	.button-bar {
 		position:fixed;

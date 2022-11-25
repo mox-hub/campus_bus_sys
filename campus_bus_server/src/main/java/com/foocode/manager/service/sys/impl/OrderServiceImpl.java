@@ -143,7 +143,7 @@ public class OrderServiceImpl implements OrderService {
     public Object createOrder(Order order) {
         try {
             int res = orderMapper.insert(order);
-            Response<Object> response = new Response<>(res, "已添加一条数据！");
+            Response<Object> response = new Response<>(order.getOrderId().toString(), "已添加一条数据！");
             logger.info("[{}] OrderService::添加{}数据 >>> 添加成功！[{}]", projectName, text, response);
             return response;
         } catch (NullPointerException e) {

@@ -1,6 +1,11 @@
 package com.foocode.manager.model.sys;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 public class OrderVo {
+
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long orderId;
     private Integer userId;
     private String userName;

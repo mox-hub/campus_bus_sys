@@ -28,7 +28,10 @@
 		{
 			"path": "pages/ticket/out_ticket",
 			"style": {
-				"navigationBarTitleText": "出票"
+				"navigationBarTitleText": "确认订单",
+				"app-plus": {
+					"titleNView": false
+				}
 			}
 		},
 		{
