@@ -1,19 +1,24 @@
 <template>
 <view class="container">
-	
+		<!-- 自定义导航栏 -->
+		<tui-navigation-bar :isOpacity="false" title="确认订单" backgroundColor="#5677fc" color="#f1f1f1">
+			<view class="header-box">
+				<tui-icon name="arrowleft" :color="'#fff'" @click="navigateBack"></tui-icon>
+			</view>
+		</tui-navigation-bar>
 		<view class="header">
 			<view>您共有</view>
-			<view class="coupon-num">{{couponNum}}张</view>
+			<view class="coupon-num">{{pageTotal}}张</view>
 			<view>车票</view>
 		</view>
 	
 		<view class="coupon-list">
-			<view class="coupon-item" v-for="(item, index) in couponList" :key="index">
+			<view class="coupon-item" v-for="(item, index) in orderDataRes" :key="index">
 				<view class="coupon">
 					<image src="/static/images/ticket/img_fuwuquan_blue_3x.png" class="coupon-img"></image>
 					<view class="left-tit-box">
-						<view class="tit">{{ item.name }}</view>
-						<view class="term">期限：{{ item.invalidTime }}</view>
+						<view class="tit">{{ item.startLocation}}->{{item.endLocation}}</view>
+						<view class="term">期限：{{ item.orderStatus }}</view>
 					</view>
 					<view class="right-detail" @tap="spread(index)">
 						<text class="detail-txt">查看详情</text>
@@ -21,8 +26,8 @@
 					</view>
 				</view>
 				<view class="hidden-box" v-show="item.spread">
-					<view class="code-tit">验证码</view>
-					<view class="code-num">{{ item.code }}</view>
+					<view class="code-tit">订单号</view>
+					<view class="code-num">{{ item.orderId }}</view>
 					<view class="qrcode-box">
 						<view class="qrcode">
 							<canvas
@@ -34,16 +39,17 @@
 						</view>
 					</view>
 					<view class="list-item">
-						<view class="item-tit">券有效期</view>
-						<view class="item-con">{{ item.sendTime }}至{{ item.invalidTime }}</view>
+						<view class="item-tit">乘车时间</view>
+						<view class="item-con">{{ item.orderStatus }}</view>
 					</view>
 					<view class="list-item">
-						<view class="item-tit">适用商家</view>
-						<view class="item-con">{{ item.suitStore }}</view>
+						<view class="item-tit">乘坐车辆</view>
+						<view class="item-con">{{ item.busName }}: {{item.seatInfo}}座</view>
 					</view>
-
-					<view class="explain">使用说明</view>
-					<view class="explain-text" v-for="(items, index) in item.useDescribe" :key="items">{{ items }}</view>
+					<view class="list-item">
+						<view class="item-tit">乘车地点</view>
+						<view class="item-con">{{item.startStation}}</view>
+					</view>
 				</view>
 			</view>
 		</view>
@@ -54,11 +60,19 @@
 <script>
 import util from '@/utils/util.js'
 import qrCode from '@/libs/weapp-qrcode.js';
+import { getDataNoParam, getDataParam, insertData, deleteData, updateData } from "../../api/api.js";
 export default {
 	data() {
 		return {
 			show: false,
-			couponNum: 4,
+			pageTotal: 0,
+			query: {
+				mode:"user",
+				options:"1",   
+				pageIndex:1,
+				pageSize:10,
+			},
+			orderDataRes: [],
 			couponList: [
 				{
 					name: '购物券',
@@ -87,6 +101,7 @@ export default {
 		//const qrcode_w = uni.upx2px(260);
 		//this.qrcode_w = qrcode_w;
 		uni.hideTabBar({})
+		this.getOrderData()
 		// #ifdef APP-PLUS || MP
 		setTimeout(() => {
 			this.couponQrCode(this.couponList[0].code, 'couponQrcode0');
@@ -94,15 +109,30 @@ export default {
 		// #endif
 	},
 	methods: {
+		// 获取排班信息
+		getOrderData: function(){
+			getDataParam(this.query,'/order/queryOrderAssociated').then((res) => {
+				console.log(res);
+				this.orderDataRes = res.data;
+				console.log(this.orderDataRes);
+				for(var item in this.orderDataRes){
+					console.log(this.orderDataRes[item])
+					this.orderDataRes[item].spread = false;
+				}
+				console.log(this.orderDataRes);
+				this.pageTotal = res.pageTotal || 10;
+			})
+		},
+		
 		spread: function(index) {
-			let couponList = this.couponList;
-			if (!couponList[index].spread) {
+			let orderDataRes = this.orderDataRes;
+			if (!orderDataRes[index].spread) {
 				setTimeout(() => {
-					this.couponQrCode(couponList[index].code, 'couponQrcode' + index);
+					this.couponQrCode(orderDataRes[index].orderId, 'couponQrcode' + index);
 				}, 60);
 			}
-			couponList[index].spread = !couponList[index].spread;
-			this.couponList = couponList;
+			orderDataRes[index].spread = !orderDataRes[index].spread;
+			this.orderDataRes = orderDataRes;
 		},
 		// 二维码生成工具
 		couponQrCode(text, canvasId) {
@@ -121,6 +151,9 @@ export default {
 					}
 				}, 0);
 			}
+		},
+		navigateBack() {
+			uni.navigateBack();
 		}
 	}
 };
@@ -159,11 +192,25 @@ export default {
 	z-index: 999999;
 }
 
+.header-box {
+	width: 100%;
+	position: fixed;
+	top: 10rpx;
+	padding: 0 12rpx;
+	display: flex;
+	align-items: center;
+	height: 32px;
+	transform: translateZ(0);
+	z-index: 99999;
+	box-sizing: border-box;
+}
+
 .coupon-num {
 	color: #5677fc;
 }
 
 .coupon-list {
+	margin-top: 100rpx;
 	width: 100%;
 	padding: 54rpx 50rpx;
 	box-sizing: border-box;

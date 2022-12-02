@@ -2,7 +2,7 @@
 	<!-- 页面 -->
 	<view class="content">	
 		<!-- 导航栏 -->
-		<tui-navigation-bar splitLine title="NavBar自定义导航栏" backgroundColor="#fff" color="#333">
+		<tui-navigation-bar splitLine title="NavBar自定义导航栏" backgroundColor="#000" color="#333">
 		</tui-navigation-bar>
 		
 	

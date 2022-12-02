@@ -44,8 +44,10 @@
             "path" : "pages/ticket/ticket",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "",
-                "enablePullDownRefresh": false
+				"navigationBarTitleText": "我的车票",
+				"app-plus": {
+					"titleNView": false
+				}
             }
             
         }

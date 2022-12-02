@@ -10,6 +10,17 @@
 				</view>
 			</view>
 		</tui-navigation-bar>
+		
+		<!-- tips -->
+		<view class='tui-notice-board'>
+			<view class="tui-icon-bg">
+				<tui-icon name="news-fill" :size='24' color='#f54f46'></tui-icon>
+			</view>
+			<view class="tui-scorll-view" @tap='detail'>
+				<view class="tui-notice" :class="[animation?'tui-animation':'']">订单将在下单后10分钟自动关闭，请尽快确定</view>
+			</view>
+		</view>
+		
 		<!-- 站点显示 -->
 		<view class="card" v-for="item in orderDataRes">
 			<view class="card-flex card-station">
@@ -85,6 +96,7 @@
 				countdownm:'',
 				countdowns:'',
 				timer: null,
+				animation: false,
 				query: {
 					mode:"id",
 					options:"1596140446891089922",   
@@ -143,17 +155,25 @@
 					this.countdownh = this.countdownm= this.countdowns = "00"
 				}
 			},
+			detail(e) {
+				this.tui.toast('详情功能尚未完善~')
+			},
+			
 			commit() {
-				
-			}
+				uni.switchTab({
+					url:"/pages/index/index"
+				})
+			},
 
 		},
 		
 		// 加载
 		onLoad(e) {
-			this.query.options = e.orderId
+			this.query.options = e.orderId;
 			this.getOrderData();
-			
+			setTimeout(() => {
+				this.animation = true
+			}, 600)
 
 		},
 	}
@@ -274,5 +294,72 @@
 		bottom: 0rpx;
 		width: 96%;
 		padding: 10rpx;
+	}
+	
+	.tui-notice-board {
+		width: 100%;
+		padding-right: 30rpx;
+		box-sizing: border-box;
+		font-size: 28rpx;
+		height: 60rpx;
+		background: #fff8d5;
+		display: flex;
+		align-items: center;
+		position: fixed;
+		top: 0;
+		/* #ifdef H5 */
+		top: 44px;
+		/* #endif */
+		z-index: 999;
+	}
+	
+	.tui-icon-bg {
+		background: #fff8d5;
+		padding-left: 30rpx;
+		position: relative;
+		z-index: 10;
+	}
+	
+	.tui-icon-class {
+		margin-right: 12rpx;
+	}
+	
+	.tui-scorll-view {
+		flex: 1;
+		line-height: 1;
+		white-space: nowrap;
+		overflow: hidden;
+		color: #f54f46;
+	}
+	
+	.tui-notice {
+		-webkit-backface-visibility: hidden;
+		-webkit-perspective: 1000;
+		transform: translate3d(100%, 0, 0);
+	}
+	
+	.tui-animation {
+		-webkit-animation: tui-rolling 12s linear infinite;
+		animation: tui-rolling 12s linear infinite;
+	}
+	
+	@-webkit-keyframes tui-rolling {
+		0% {
+			transform: translate3d(100%, 0, 0);
+		}
+	
+		100% {
+			transform: translate3d(-170%, 0, 0);
+		}
+	}
+	
+	@keyframes tui-rolling {
+		0% {
+			transform: translate3d(100%, 0, 0);
+		}
+	
+		100% {
+			transform: translate3d(-170%, 0, 0);
+		}
 	}
 </style>

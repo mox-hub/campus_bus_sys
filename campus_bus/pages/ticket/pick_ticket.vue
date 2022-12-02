@@ -140,6 +140,9 @@
 				insertData(this.order,'/order/createOrder').then((res) => {
 					console.log(res);
 					this.orderId = res.data;
+					uni.navigateTo({
+						url: '/pages/ticket/out_ticket?orderId='+this.orderId,
+					});
 				})
 			},
 			
@@ -174,10 +177,7 @@
 				console.log(this.showTime())
 				this.order.orderTime = this.showTime();
 				this.order.seatInfo =  this.fix(this.column,2) + this.fix(this.row,2);
-				this.insertOrder();
-				uni.navigateTo({
-					url: '/pages/ticket/out_ticket?orderId='+this.orderId,
-				})
+				this.insertOrder();				
 			},
 			
 			/* 工具函数 */
@@ -286,6 +286,7 @@
 	}
 	.seat-panel {
 		border-radius: 20rpx;
+		margin-top: 20rpx;
 		display: flex;
 		width: 100%;
 	}
