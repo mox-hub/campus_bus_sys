@@ -1,10 +1,10 @@
 <template>
     <div class="login-wrap">
         <div class="ms-login">
-            <div class="ms-title">高校学生就业管理系统</div>
+            <div class="ms-title">校车订票管理系统</div>
             <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
                 <el-form-item prop="username">
-                    <el-input v-model="param.username" placeholder="请输入学号">
+                    <el-input v-model="param.username" placeholder="请输入用户名">
                         <template #prepend>
                             <el-button icon="el-icon-user"></el-button>
                         </template>
@@ -45,7 +45,7 @@ export default {
             username: [
                 {
                     required: true,
-                    message: "请输入学号",
+                    message: "请输入用户名",
                     trigger: "blur",
                 },
             ],
