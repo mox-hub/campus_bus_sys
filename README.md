@@ -16,19 +16,8 @@
 
 ![编辑部分](https://img.moxhub.cn/blog/image-20221205164508048.png)
 
-![添加路线](E:\repos\GithubRepos\campus_bus_sys\upload\image-20221205164616337.png)
-
-![image-20221205164929051](https://img.moxhub.cn/blog/image-20221205164929051.png)
-
-![image-20221205164947459](https://img.moxhub.cn/blog/image-20221205164947459.png)
-
-![image-20221205165059227](https://img.moxhub.cn/blog/image-20221205165059227.png)
-
-![image-20221205165119250](https://img.moxhub.cn/blog/image-20221205165119250.png)
-
-![image-20221205165132551](https://img.moxhub.cn/blog/image-20221205165132551.png)
-
-![image-20221205165158208](https://img.moxhub.cn/blog/image-20221205165158208.png)
+![image-20221205164947459](https://img.moxhub.cn/blog/image-20221205164947459.png)![image-20221205165119250](https://img.moxhub.cn/blog/image-20221205165119250.png)
+![image-20221205165132551](https://img.moxhub.cn/blog/image-20221205165132551.png)![image-20221205165158208](https://img.moxhub.cn/blog/image-20221205165158208.png)
 
 
 
