@@ -22,7 +22,7 @@
             </div>
             <!-- 用户表单 -->
             <el-table :data="userData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
-                <el-table-column prop="userId" label="用户ID"  align="center"></el-table-column>
+                <el-table-column prop="userId" label="用户ID" align="center"></el-table-column>
                 <el-table-column prop="userName" label="用户名称" align="center"></el-table-column>
                 <el-table-column prop="avatar" label="用户头像" align="center"></el-table-column>
                 <el-table-column prop="phone" label="联系方式" align="center"></el-table-column>
@@ -64,7 +64,7 @@
         <!-- 添加弹出框 有校验 -->
         <el-dialog title="添加用户" v-model="addVisible" width="30%">
             <el-form :model="ruleForm" ref="ruleFormRef" :rules="addRules" label-width="100px">
-            <!-- <el-form rules="rules" label-width="70px"> -->
+                <!-- <el-form rules="rules" label-width="70px"> -->
                 <el-form-item label="用户ID：" prop="userId">
                     <el-input v-model="ruleForm.userId" placeholder=""></el-input>
                 </el-form-item>
@@ -84,41 +84,41 @@
 
 <script>
 
-import { ref, reactive } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
-import { getDataNoParam, getDataParam, insertData, deleteData, updateData } from "../../api/index";
+import { ref, reactive } from "vue"
+import { ElMessage, ElMessageBox } from "element-plus"
+import { getDataNoParam, getDataParam, insertData, deleteData, updateData } from "../../api/index"
 
 export default {
     name: "userTable",
-    setup() {
+    setup () {
         // 可视化 相关数据
-        const addVisible = ref(false);
-        const editVisible = ref(false);
+        const addVisible = ref(false)
+        const editVisible = ref(false)
         // data 相关数据
-        const userData = ref([]);
-        const pageTotal = ref(0);
-        const menu = ref([]);
+        const userData = ref([])
+        const pageTotal = ref(0)
+        const menu = ref([])
         // request 相关数据
-        const path = "/user/queryUser";
+        const path = "/user/queryUser"
         const query = reactive({
-            mode:"uid",
-            options:"all",          
-            pageIndex:1,
-            pageSize:10,
+            mode: "uid",
+            options: "all",
+            pageIndex: 1,
+            pageSize: 10,
 
-        });
+        })
         // 表单
         const form = reactive({
-            userId:"",
+            userId: "",
             userName: "",
-        });
+        })
         // 规则校验表单
         const ruleForm = reactive({
-            userId:"",
+            userId: "",
             userName: "",
-        });
+        })
         const deleteParam = reactive({
-             userId:"",
+            userId: "",
         })
         // 表单规则
         const ruleFormRef = ref()
@@ -146,41 +146,41 @@ export default {
             ],
         })
 
-        /** 定义方法 */ 
+        /** 定义方法 */
 
         // 获取表格数据
         const getFormData = () => {
-            getDataParam(query,path).then((res) => {
+            getDataParam(query, path).then((res) => {
                 console.log(res)
                 userData.value = res.data
                 pageTotal.value = res.pageTotal || 10
-            });
-        };
+            })
+        }
 
         // 添加用户数据
         const addUserData = (data) => {
-            insertData(data,"/user/createUser").then((res) => {
-                console.log(res.data);
-            });
+            insertData(data, "/user/createUser").then((res) => {
+                console.log(res.data)
+            })
         }
         // 删除用户数据
         const deleteUserData = (data) => {
-            deleteData(data,"/user/deleteUser").then((res) => {
+            deleteData(data, "/user/deleteUser").then((res) => {
                 console.log(res.data)
                 // refresh;
-            });
+            })
         }
 
         /** 按钮事件  */
 
         // 分页导航
         const handlePageChange = (val) => {
-            query.pageIndex = val;
-            getFormData();
-        };
+            query.pageIndex = val
+            getFormData()
+        }
         // 添加操作
         const handleAdd = () => {
-            addVisible.value = true;
+            addVisible.value = true
         }
         // 删除操作
         const handleDelete = (index, row) => {
@@ -188,32 +188,32 @@ export default {
             ElMessageBox.confirm("确定要删除吗？", "提示", {
                 type: "warning",
             })
-            .then(() => {
-                deleteParam.userId = row.userId
-                deleteUserData(deleteParam);
-                ElMessage.success("删除成功");
-                getFormData();
-            })
-            .catch(() => {});
-        };
+                .then(() => {
+                    deleteParam.userId = row.userId
+                    deleteUserData(deleteParam)
+                    ElMessage.success("删除成功")
+                    getFormData()
+                })
+                .catch(() => { })
+        }
 
         // 查询操作
         const handleSearch = () => {
-            query.pageIndex = 1;
-            getFormData();
-        };
+            query.pageIndex = 1
+            getFormData()
+        }
 
         // 保存新增内容 
         const saveCreate = () => {
-            addVisible.value = false;
+            addVisible.value = false
             console.log(ruleForm)
-            addUserData(ruleForm);
-            ElMessage.success(`添加新用户成功`);
-            getFormData();
+            addUserData(ruleForm)
+            ElMessage.success(`添加新用户成功`)
+            getFormData()
         }
 
         // setup时执行的函数
-        getFormData();
+        getFormData()
 
         return {
             query,
@@ -232,9 +232,9 @@ export default {
             handleSearch,
             handleAdd,
             saveCreate,
-        };
+        }
     },
-};
+}
 </script>
 
 <style scoped>
@@ -250,16 +250,20 @@ export default {
     width: 300px;
     display: inline-block;
 }
+
 .table {
     width: 100%;
     font-size: 14px;
 }
+
 .red {
     color: #ff0000;
 }
+
 .mr10 {
     margin-right: 10px;
 }
+
 .table-td-thumb {
     display: block;
     margin: auto;

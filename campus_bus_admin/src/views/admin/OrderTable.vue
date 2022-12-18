@@ -22,9 +22,9 @@
             </div>
             <!-- 订单表单 -->
             <el-table :data="orderData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
-                <el-table-column prop="orderId" label="订单ID"  align="center"></el-table-column>
-                <el-table-column prop="userId" label="用户ID"  align="center"></el-table-column>
-                <el-table-column prop="scheduleId" label="排班ID"  align="center"></el-table-column>
+                <el-table-column prop="orderId" label="订单ID" align="center"></el-table-column>
+                <el-table-column prop="userId" label="用户ID" align="center"></el-table-column>
+                <el-table-column prop="scheduleId" label="排班ID" align="center"></el-table-column>
                 <el-table-column prop="seatInfo" label="座位号" align="center"></el-table-column>
                 <el-table-column prop="orderTime" label="订单时间" align="center"></el-table-column>
                 <el-table-column prop="orderStatus" label="订单状态" align="center"></el-table-column>
@@ -66,7 +66,7 @@
         <!-- 添加弹出框 有校验 -->
         <el-dialog title="添加订单" v-model="addVisible" width="30%">
             <el-form :model="ruleForm" ref="ruleFormRef" :rules="addRules" label-width="100px">
-            <!-- <el-form rules="rules" label-width="70px"> -->
+                <!-- <el-form rules="rules" label-width="70px"> -->
                 <el-form-item label="订单ID：" prop="orderId">
                     <el-input v-model="ruleForm.orderId" placeholder=""></el-input>
                 </el-form-item>
@@ -86,41 +86,41 @@
 
 <script>
 
-import { ref, reactive } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
-import { getDataNoParam, getDataParam, insertData, deleteData, updateData } from "../../api/index";
+import { ref, reactive } from "vue"
+import { ElMessage, ElMessageBox } from "element-plus"
+import { getDataNoParam, getDataParam, insertData, deleteData, updateData } from "../../api/index"
 
 export default {
     name: "orderTable",
-    setup() {
+    setup () {
         // 可视化 相关数据
-        const addVisible = ref(false);
-        const editVisible = ref(false);
+        const addVisible = ref(false)
+        const editVisible = ref(false)
         // data 相关数据
-        const orderData = ref([]);
-        const pageTotal = ref(0);
-        const menu = ref([]);
+        const orderData = ref([])
+        const pageTotal = ref(0)
+        const menu = ref([])
         // request 相关数据
-        const path = "/order/queryOrder";
+        const path = "/order/queryOrder"
         const query = reactive({
-            mode:"id",
-            options:"all",          
-            pageIndex:1,
-            pageSize:10,
+            mode: "id",
+            options: "all",
+            pageIndex: 1,
+            pageSize: 10,
 
-        });
+        })
         // 表单
         const form = reactive({
-            orderId:"",
+            orderId: "",
             orderName: "",
-        });
+        })
         // 规则校验表单
         const ruleForm = reactive({
-            orderId:"",
+            orderId: "",
             orderName: "",
-        });
+        })
         const deleteParam = reactive({
-             orderId:"",
+            orderId: "",
         })
         // 表单规则
         const ruleFormRef = ref()
@@ -148,61 +148,61 @@ export default {
             ],
         })
 
-        /** 定义方法 */ 
+        /** 定义方法 */
 
         // 获取表格数据
         const getFormData = () => {
-            getDataParam(query,path).then((res) => {
+            getDataParam(query, path).then((res) => {
                 console.log(res)
                 orderData.value = res.data
                 pageTotal.value = res.pageTotal || 10
-            });
-        };
+            })
+        }
 
         // 添加订单数据
         const addOrderData = (data) => {
-            insertData(data,"/order/createOrder").then((res) => {
-                console.log(res.data);
-            });
+            insertData(data, "/order/createOrder").then((res) => {
+                console.log(res.data)
+            })
         }
         // 更新订单数据
         const updateOrderData = (data) => {
-            updateData(data,"/reg/updateOrder").then((res) => {
+            updateData(data, "/reg/updateOrder").then((res) => {
                 console.log(res.data)
                 // refresh;
-            });
+            })
         }
 
         // 删除订单数据
         const deleteOrderData = (data) => {
-            deleteData(data,"/order/deleteOrder").then((res) => {
+            deleteData(data, "/order/deleteOrder").then((res) => {
                 console.log(res.data)
                 // refresh;
-            });
+            })
         }
 
         /** 按钮事件  */
 
         // 分页导航
         const handlePageChange = (val) => {
-            query.pageIndex = val;
-            getFormData();
-        };
+            query.pageIndex = val
+            getFormData()
+        }
         // 添加操作
         const handleAdd = () => {
-            addVisible.value = true;
+            addVisible.value = true
         }
 
         // 编辑操作
-        let idx = -1;
+        let idx = -1
         const handleEdit = (index, row) => {
-            idx = index;
+            idx = index
             Object.keys(form).forEach((item) => {
-                form[item] = row[item];
-                console.log(form[item]);
-            });
-            editVisible.value = true;
-        };
+                form[item] = row[item]
+                console.log(form[item])
+            })
+            editVisible.value = true
+        }
 
         // 删除操作
         const handleDelete = (index, row) => {
@@ -210,43 +210,43 @@ export default {
             ElMessageBox.confirm("确定要删除吗？", "提示", {
                 type: "warning",
             })
-            .then(() => {
-                deleteParam.orderId = row.orderId
-                deleteOrderData(deleteParam);
-                ElMessage.success("删除成功");
-                getFormData();
-            })
-            .catch(() => {});
-        };
+                .then(() => {
+                    deleteParam.orderId = row.orderId
+                    deleteOrderData(deleteParam)
+                    ElMessage.success("删除成功")
+                    getFormData()
+                })
+                .catch(() => { })
+        }
 
         // 查询操作
         const handleSearch = () => {
-            query.pageIndex = 1;
-            getFormData();
-        };
+            query.pageIndex = 1
+            getFormData()
+        }
 
         // 保存新增内容 
         const saveCreate = () => {
-            addVisible.value = false;
+            addVisible.value = false
             console.log(ruleForm)
-            addOrderData(ruleForm);
-            ElMessage.success(`添加新用户成功`);
-            getFormData();
+            addOrderData(ruleForm)
+            ElMessage.success(`添加新用户成功`)
+            getFormData()
         }
 
         // 保存编辑内容
         const saveEdit = () => {
-            editVisible.value = false;
+            editVisible.value = false
             Object.keys(form).forEach((item) => {
-               orderData.value[idx][item] = form[item];
-            });
+                orderData.value[idx][item] = form[item]
+            })
             console.log(orderData.value[idx])
-            updateOrderData(orderData.value[idx]);
-            ElMessage.success(`修改第 ${idx + 1} 行成功`);
-            getFormData();
-        };
+            updateOrderData(orderData.value[idx])
+            ElMessage.success(`修改第 ${idx + 1} 行成功`)
+            getFormData()
+        }
         // setup时执行的函数
-        getFormData();
+        getFormData()
 
         return {
             query,
@@ -267,9 +267,9 @@ export default {
             saveCreate,
             handleEdit,
             saveEdit,
-        };
+        }
     },
-};
+}
 </script>
 
 <style scoped>
@@ -285,16 +285,20 @@ export default {
     width: 300px;
     display: inline-block;
 }
+
 .table {
     width: 100%;
     font-size: 14px;
 }
+
 .red {
     color: #ff0000;
 }
+
 .mr10 {
     margin-right: 10px;
 }
+
 .table-td-thumb {
     display: block;
     margin: auto;

@@ -22,7 +22,7 @@
             </div>
             <!-- 校区表单 -->
             <el-table :data="campusData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
-                <el-table-column prop="campusId" label="校区ID"  align="center"></el-table-column>
+                <el-table-column prop="campusId" label="校区ID" align="center"></el-table-column>
                 <el-table-column prop="campusName" label="校区名称" align="center"></el-table-column>
                 <!-- 操作栏 -->
                 <el-table-column label="操作" width="180" align="center">
@@ -60,7 +60,7 @@
         <!-- 添加弹出框 有校验 -->
         <el-dialog title="添加校区" v-model="addVisible" width="30%">
             <el-form :model="ruleForm" ref="ruleFormRef" :rules="addRules" label-width="100px">
-            <!-- <el-form rules="rules" label-width="70px"> -->
+                <!-- <el-form rules="rules" label-width="70px"> -->
                 <el-form-item label="校区ID：" prop="campusId">
                     <el-input v-model="ruleForm.campusId" placeholder=""></el-input>
                 </el-form-item>
@@ -80,41 +80,41 @@
 
 <script>
 
-import { ref, reactive } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
-import { getDataNoParam, getDataParam, insertData, deleteData, updateData } from "../../api/index";
+import { ref, reactive } from "vue"
+import { ElMessage, ElMessageBox } from "element-plus"
+import { getDataNoParam, getDataParam, insertData, deleteData, updateData } from "../../api/index"
 
 export default {
     name: "campusTable",
-    setup() {
+    setup () {
         // 可视化 相关数据
-        const addVisible = ref(false);
-        const editVisible = ref(false);
+        const addVisible = ref(false)
+        const editVisible = ref(false)
         // data 相关数据
-        const campusData = ref([]);
-        const pageTotal = ref(0);
-        const menu = ref([]);
+        const campusData = ref([])
+        const pageTotal = ref(0)
+        const menu = ref([])
         // request 相关数据
-        const path = "/campus/queryCampus";
+        const path = "/campus/queryCampus"
         const query = reactive({
-            mode:"id",
-            options:"all",          
-            pageIndex:1,
-            pageSize:10,
+            mode: "id",
+            options: "all",
+            pageIndex: 1,
+            pageSize: 10,
 
-        });
+        })
         // 表单
         const form = reactive({
-            campusId:"",
+            campusId: "",
             campusName: "",
-        });
+        })
         // 规则校验表单
         const ruleForm = reactive({
-            campusId:"",
+            campusId: "",
             campusName: "",
-        });
+        })
         const deleteParam = reactive({
-             campusId:"",
+            campusId: "",
         })
         // 表单规则
         const ruleFormRef = ref()
@@ -142,41 +142,41 @@ export default {
             ],
         })
 
-        /** 定义方法 */ 
+        /** 定义方法 */
 
         // 获取表格数据
         const getFormData = () => {
-            getDataParam(query,path).then((res) => {
+            getDataParam(query, path).then((res) => {
                 console.log(res)
                 campusData.value = res.data
                 pageTotal.value = res.pageTotal || 10
-            });
-        };
+            })
+        }
 
         // 添加校区数据
         const addCampusData = (data) => {
-            insertData(data,"/campus/createCampus").then((res) => {
-                console.log(res.data);
-            });
+            insertData(data, "/campus/createCampus").then((res) => {
+                console.log(res.data)
+            })
         }
         // 删除校区数据
         const deleteCampusData = (data) => {
-            deleteData(data,"/campus/deleteCampus").then((res) => {
+            deleteData(data, "/campus/deleteCampus").then((res) => {
                 console.log(res.data)
                 // refresh;
-            });
+            })
         }
 
         /** 按钮事件  */
 
         // 分页导航
         const handlePageChange = (val) => {
-            query.pageIndex = val;
-            getFormData();
-        };
+            query.pageIndex = val
+            getFormData()
+        }
         // 添加操作
         const handleAdd = () => {
-            addVisible.value = true;
+            addVisible.value = true
         }
         // 删除操作
         const handleDelete = (index, row) => {
@@ -184,32 +184,32 @@ export default {
             ElMessageBox.confirm("确定要删除吗？", "提示", {
                 type: "warning",
             })
-            .then(() => {
-                deleteParam.campusId = row.campusId
-                deleteCampusData(deleteParam);
-                ElMessage.success("删除成功");
-                getFormData();
-            })
-            .catch(() => {});
-        };
+                .then(() => {
+                    deleteParam.campusId = row.campusId
+                    deleteCampusData(deleteParam)
+                    ElMessage.success("删除成功")
+                    getFormData()
+                })
+                .catch(() => { })
+        }
 
         // 查询操作
         const handleSearch = () => {
-            query.pageIndex = 1;
-            getFormData();
-        };
+            query.pageIndex = 1
+            getFormData()
+        }
 
         // 保存新增内容 
         const saveCreate = () => {
-            addVisible.value = false;
+            addVisible.value = false
             console.log(ruleForm)
-            addCampusData(ruleForm);
-            ElMessage.success(`添加校区成功`);
-            getFormData();
+            addCampusData(ruleForm)
+            ElMessage.success(`添加校区成功`)
+            getFormData()
         }
 
         // setup时执行的函数
-        getFormData();
+        getFormData()
 
         return {
             query,
@@ -228,9 +228,9 @@ export default {
             handleSearch,
             handleAdd,
             saveCreate,
-        };
+        }
     },
-};
+}
 </script>
 
 <style scoped>
@@ -246,16 +246,20 @@ export default {
     width: 300px;
     display: inline-block;
 }
+
 .table {
     width: 100%;
     font-size: 14px;
 }
+
 .red {
     color: #ff0000;
 }
+
 .mr10 {
     margin-right: 10px;
 }
+
 .table-td-thumb {
     display: block;
     margin: auto;
